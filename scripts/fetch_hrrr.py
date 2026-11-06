@@ -29,12 +29,12 @@ import yaml
 
 warnings.filterwarnings("ignore")  # cfgrib/xarray FutureWarnings are very noisy
 
-from herbie import Herbie  # noqa: E402
-
 SYNOPTIC_HOURS = (0, 6, 12, 18)
 LAST_FXX = 48
 WAIT_MINUTES = 10
 GIVE_UP_MINUTES = 60
+DOWNLOAD_ATTEMPTS = 5          # per forecast hour; AWS S3 sometimes answers 503 for a moment
+RETRY_WAIT_SECONDS = 5         # doubles each time: 5, 10, 20, 40
 
 # Herbie "search" regex, matched against the .idx inventory lines.
 # 2 m T and Td, 10 m u/v wind, precip rate, categorical precip type
@@ -80,7 +80,8 @@ def latest_cycle(now: datetime) -> datetime:
     return now.replace(hour=hour, minute=0, second=0, microsecond=0)
 
 
-def make_herbie(cycle: datetime, fxx: int, cache_dir: Path) -> Herbie:
+def make_herbie(cycle: datetime, fxx: int, cache_dir: Path):
+    from herbie import Herbie   # imported here so the module loads (and its logic can be tested) without Herbie
     return Herbie(
         cycle.strftime("%Y-%m-%d %H:%M"),
         model="hrrr",
@@ -136,9 +137,26 @@ def ptype(row) -> str:
 
 
 def read_hour(cycle: datetime, fxx: int, cache_dir: Path) -> list:
-    H = make_herbie(cycle, fxx, cache_dir)
-    ds = H.xarray(SEARCH)
-    return ds if isinstance(ds, list) else [ds]
+    """Download and open one forecast hour, retrying brief network/server errors.
+
+    A failed attempt can leave a half-written file behind, so every retry
+    re-downloads (overwrite=True) instead of trusting what is on disk. If all
+    attempts fail the error is raised, which stops the whole run: we never
+    publish a partial forecast.
+    """
+    for attempt in range(1, DOWNLOAD_ATTEMPTS + 1):
+        try:
+            H = make_herbie(cycle, fxx, cache_dir)
+            ds = H.xarray(SEARCH, overwrite=attempt > 1)
+            return ds if isinstance(ds, list) else [ds]
+        except Exception as exc:
+            if attempt == DOWNLOAD_ATTEMPTS:
+                log(f"f{fxx:02d}: giving up after {DOWNLOAD_ATTEMPTS} attempts")
+                raise
+            wait = RETRY_WAIT_SECONDS * 2 ** (attempt - 1)
+            log(f"f{fxx:02d}: attempt {attempt}/{DOWNLOAD_ATTEMPTS} failed "
+                f"({type(exc).__name__}: {exc}); retrying in {wait}s")
+            time.sleep(wait)
 
 
 def load_sites(path: Path) -> list[dict]:

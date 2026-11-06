@@ -55,7 +55,8 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/obs
+          # `git add` errors on a path that does not exist (e.g. no sites configured yet), so check first.
+          if [ -e data/obs ]; then git add data/obs; fi
           if git diff --cached --quiet; then
             echo "Nothing new."
             exit 0
