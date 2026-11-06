@@ -1,0 +1,45 @@
+# RWIS sites near Columbus, Ohio.
+#
+# !! ALL ENTRIES ARE PLACEHOLDERS !!
+# Names, coordinates, ohgo_site_id values and pavement layers below are
+# made-up examples. Replace them with real values before trusting any forecast.
+#
+# Fields:
+#   id             short stable identifier (lowercase, no spaces)
+#   name           human-readable name
+#   lat, lon       decimal degrees (WGS84)
+#   ohgo_site_id   site ID in the OHGO RWIS API (TODO: look up)
+#   station_type   road | bridge
+#   pavement_layers  list ordered top -> bottom; each has material + thickness_m
+
+sites:
+  - id: site_001
+    name: "PLACEHOLDER - I-70 West of Columbus"
+    lat: 39.96
+    lon: -83.20
+    ohgo_site_id: "TODO"
+    station_type: road
+    pavement_layers:
+      - { material: asphalt,  thickness_m: 0.10 }
+      - { material: concrete, thickness_m: 0.25 }
+      - { material: gravel,   thickness_m: 0.30 }
+
+  - id: site_002
+    name: "PLACEHOLDER - I-270 North Outerbelt Bridge"
+    lat: 40.10
+    lon: -83.02
+    ohgo_site_id: "TODO"
+    station_type: bridge
+    pavement_layers:
+      - { material: concrete, thickness_m: 0.20 }
+      - { material: steel,    thickness_m: 0.02 }
+
+  - id: site_003
+    name: "PLACEHOLDER - I-71 South of Columbus"
+    lat: 39.85
+    lon: -83.00
+    ohgo_site_id: "TODO"
+    station_type: road
+    pavement_layers:
+      - { material: asphalt, thickness_m: 0.15 }
+      - { material: gravel,  thickness_m: 0.35 }
