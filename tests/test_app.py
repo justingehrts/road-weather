@@ -14,7 +14,7 @@ import charts
 import flags
 import road_data as rd
 
-APP = str(Path(__file__).resolve().parent.parent / "app" / "streamlit_app.py")
+APP = str(Path(__file__).resolve().parent.parent / "app" / "forecast.py")
 START = datetime(2026, 11, 5, 15, 0, tzinfo=timezone.utc)
 CYCLE = "2026110512z"
 

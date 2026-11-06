@@ -26,12 +26,13 @@ HRRR forcing ───────────┘
 - METRo needs a few hours of observations (>=2 road-temperature readings, one within 4 h with a subsurface reading). Sites without enough are skipped with a message.
 - Observations are collected **hourly** by `.github/workflows/fetch-obs.yml` (OHGO only returns the latest reading, so history has to be built up on the `data` branch).
 - The forecast workflow (`forecast.yml`) runs at 02, 08, 14 and 20 UTC (about 2 h after each HRRR cycle). If no complete HRRR run is found, METRo is skipped.
-- Both workflows push to `data`, so each retries with a rebase if the push is rejected. The forecast workflow only writes `data/forcing` and `data/roadcast`; the hourly one only writes `data/obs`.
+- All the workflows push to `data`, so each retries with a rebase if the push is rejected. Each owns its own files: the hourly one writes `data/obs`; the forecast one `data/forcing`, `data/roadcast`, `data/flags` and `data/latest.json`; the daily verify one `data/verification`.
+- Flag scoring needs OHGO to report a surface condition (dry/wet/frost/ice...). Its public docs do not list that field, so `fetch_rwis.py` may store it blank; the Verification page says so when that happens.
 
 ## Streamlit app notes
 
 - Deploy it from `main` with entrypoint `app/streamlit_app.py` (Streamlit Community Cloud is free); set Python to 3.11 in the deploy settings.
-- The app finds the newest forecast through `data/latest.json`, then loads `data/flags/<cycle>.json`, `data/roadcast/<cycle>_<site>.csv` and `data/obs/<site>.csv` from `raw.githubusercontent.com/justingehrts/road-weather/data/`. Set `ROAD_WEATHER_DATA_URL` to point it somewhere else for testing.
+- The Forecast page finds the newest forecast through `data/latest.json`, then loads `data/flags/<cycle>.json`, `data/roadcast/<cycle>_<site>.csv` and `data/obs/<site>.csv` from `raw.githubusercontent.com/justingehrts/road-weather/data/`. The Verification page reads `data/verification/summary.json`. Set `ROAD_WEATHER_DATA_URL` to point the app somewhere else for testing.
 - Data stays in UTC; the app converts to Eastern only for display. Charts follow the data-viz palette rules (one temperature axis, validated colors, table view).
 
 ## Hard rules
@@ -55,12 +56,13 @@ Prefer small, focused PRs. Don't open a PR unless asked. Don't make sweeping cha
 ## Repo layout
 
 - `sites.yaml`: the list of RWIS sites, pavement layers, bridge pairings and traffic level (placeholders until real values are filled in).
-- `scripts/`: pipeline code. `fetch_rwis.py`, `fetch_hrrr.py`, `build_metro.sh`, `run_metro.py`, `flags.py`.
+- `scripts/`: pipeline code. `fetch_rwis.py`, `fetch_hrrr.py`, `build_metro.sh`, `run_metro.py`, `flags.py`, `verify.py`.
 - `docs/flags.md`: the hazard-flag rules (source of truth for `scripts/flags.py`; edit thresholds in `THRESHOLDS` at the top of that script).
-- `app/`: Streamlit app (`streamlit_app.py`, `charts.py`, `road_data.py`, `requirements.txt`). It only **reads** from the `data` branch via raw GitHub URLs.
+- `docs/verification.md`: how forecasts and flags are checked against RWIS observations (`scripts/verify.py`).
+- `app/`: Streamlit app: `streamlit_app.py` (entry point + navigation), pages `forecast.py` and `verification.py`, plus `charts.py`, `road_data.py`, `ui.py`, `requirements.txt`. It only **reads** from the `data` branch via raw GitHub URLs.
 - `tests/`: pytest tests (`python -m pytest tests -q`). Run by `.github/workflows/tests.yml` on every PR.
-- `.github/workflows/`: `fetch-obs.yml` (hourly), `forecast.yml` (4x/day), `tests.yml`.
-- `data` branch: pipeline output only; no source code. `data/obs/`, `data/forcing/`, `data/roadcast/`, `data/flags/<cycle>.json`, and `data/latest.json` (pointer to the newest cycle that the app reads).
+- `.github/workflows/`: `fetch-obs.yml` (hourly), `forecast.yml` (4x/day), `verify.yml` (daily), `tests.yml`.
+- `data` branch: pipeline output only; no source code. `data/obs/`, `data/forcing/`, `data/roadcast/`, `data/flags/<cycle>.json`, `data/latest.json` (pointer to the newest cycle that the app reads), and `data/verification/summary.json` (daily).
 
 ## Site configuration
 

@@ -141,3 +141,38 @@ def flag_timeline(intervals: pd.DataFrame, evaluated: list[str], flag_names: dic
     layout["margin"]["t"] = 8
     fig.update_layout(**layout)
     return fig
+
+
+def error_by_lead(rows: pd.DataFrame, theme: str = "light", compact: bool = False) -> go.Figure:
+    """Bias and RMSE (one temperature axis, degrees F) for each lead-time bin.
+
+    `rows` has columns lead (e.g. "6-12"), n, bias, rmse. Bias can be negative
+    (forecast too cold); RMSE is never negative. The dashed zero line is "no bias".
+    """
+    p = PALETTES[theme]
+    leads = list(rows["lead"])
+    fig = go.Figure()
+    series = [("Bias (forecast minus observed)", "bias", p["rst"]), ("RMSE (typical error size)", "rmse", p["air"])]
+    ends = [float(rows[col].iloc[-1]) for _, col, _ in series]
+    spread = max(0.4, 0.12 * (float(rows[["bias", "rmse"]].max().max()) - float(rows[["bias", "rmse"]].min().min())))
+    label_y = _spread(ends, spread)
+    for (name, col, color), ly in zip(series, label_y):
+        fig.add_trace(go.Scatter(
+            x=leads, y=rows[col], mode="lines+markers", name=name, line=dict(color=color, width=2),
+            marker=dict(color=color, size=8, line=dict(color=p["surface"], width=2)),
+            customdata=rows["n"], hovertemplate=name.split(" (")[0] + ": %{y:.2f}°F  (n=%{customdata})<extra></extra>"))
+        if not compact:
+            fig.add_annotation(x=leads[-1], y=ly, xref="x", yref="y", text=name.split(" (")[0], showarrow=False,
+                               xanchor="left", xshift=10, font=dict(color=p["text2"], size=12))
+    fig.add_hline(y=0, line=dict(color=p["text2"], width=1, dash="dash"))
+    fig.update_layout(
+        height=380 if compact else 340, margin=dict(l=56, r=14 if compact else 96, t=60 if compact else 36, b=48),
+        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font=dict(color=p["text2"], size=13),
+        hovermode="x unified", showlegend=True,
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="left", x=0,
+                    font=dict(color=p["text2"], size=11 if compact else 13)),
+        xaxis=dict(title=dict(text="Lead time (hours after the weather-model run)", font=dict(size=12)), type="category", categoryorder="array",
+                   categoryarray=leads, gridcolor=p["grid"], linecolor=p["grid"]),
+        yaxis=dict(title="Error (°F)", gridcolor=p["grid"], zeroline=False, linecolor=p["grid"]),
+    )
+    return fig
