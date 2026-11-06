@@ -1,4 +1,4 @@
-name: Fetch RWIS observations
+name: Fetch RWIS observations and HRRR forcing
 
 on:
   workflow_dispatch:
@@ -13,6 +13,7 @@ concurrency:
 jobs:
   fetch:
     runs-on: ubuntu-latest
+    timeout-minutes: 150   # HRRR step may wait up to 60 min for f48
     steps:
       - name: Check out code (main)
         uses: actions/checkout@v4
@@ -32,22 +33,27 @@ jobs:
           python-version: "3.11"
 
       - name: Install dependencies
-        run: pip install requests==2.32.3 pyyaml==6.0.2
+        run: pip install requests==2.32.3 pyyaml==6.0.2 herbie-data==2026.10.0 cfgrib==0.9.15.1 eccodes==2.50.0
 
       - name: Fetch observations
         env:
           OHGO_API_KEY: ${{ secrets.OHGO_API_KEY }}
         run: python scripts/fetch_rwis.py --out-dir databranch/data/obs
 
+      - name: Fetch HRRR forcing (waits up to 60 min for forecast hour 48)
+        run: python scripts/fetch_hrrr.py --out-dir databranch/data/forcing
+
+      # Runs even if the HRRR step failed, so fresh observations are still saved.
       - name: Commit CSVs to data branch
+        if: ${{ !cancelled() }}
         working-directory: databranch
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/obs
+          git add data/obs data/forcing
           if git diff --cached --quiet; then
             echo "No new observations."
           else
-            git commit -m "Add RWIS observations $(date -u +%Y-%m-%dT%H:%MZ)"
+            git commit -m "Add RWIS observations and HRRR forcing $(date -u +%Y-%m-%dT%H:%MZ)"
             git push origin data
           fi
