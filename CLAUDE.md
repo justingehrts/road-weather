@@ -18,6 +18,14 @@ HRRR forcing ───────────┘
 5. **Publish**: write results to the `data` branch.
 6. **Display**: the Streamlit app reads from the `data` branch.
 
+## METRo notes
+
+- METRo 4.0.1 (pinned commit) is built by `scripts/build_metro.sh`, with a small patch for Python 3.12 / numpy 1.24+ (`scripts/metro_patches/`). The build is cached in Actions.
+- METRo runs on the runner's **system Python** (apt `python3-libxml2`), *not* the project's 3.11. `scripts/run_metro.py` runs on 3.11 and launches METRo as a separate process. Don't `pip install` METRo's dependencies into the 3.11 environment.
+- Pavement layer materials in `sites.yaml` must be one of METRo's four: asphalt, cement/concrete, crushed rock/gravel, sand.
+- METRo needs a few hours of observations (>=2 road-temperature readings, one within 4 h with a subsurface reading). Sites without enough are skipped with a message.
+- The workflow runs at 02, 08, 14 and 20 UTC (about 2 h after each HRRR cycle). If no complete HRRR run is found, METRo is skipped.
+
 ## Hard rules
 
 - **Everything runs on GitHub Actions.** The repo is public and uses free runners. No paid services, no paid APIs, no self-hosted infrastructure.
