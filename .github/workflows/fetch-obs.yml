@@ -1,0 +1,72 @@
+name: Fetch RWIS observations (hourly)
+
+# METRo needs several hours of road-station readings, but OHGO only gives the
+# latest one. So we collect one reading per site every hour and keep them on
+# the `data` branch. The forecast workflow reads them from there.
+#
+# NOTE: GitHub only runs `schedule:` triggers for the workflow file on the
+# default branch (main), so the hourly schedule starts once this is merged.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "20 * * * *"   # minute 20, to avoid GitHub's busy top-of-hour queue
+
+permissions:
+  contents: write   # needed to push CSVs to the `data` branch
+
+# Separate from the forecast workflow's group so a long HRRR wait there never
+# blocks or drops hourly readings. Both only touch different files on `data`.
+concurrency:
+  group: obs-fetch
+  cancel-in-progress: false
+
+jobs:
+  fetch-obs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out code (main)
+        uses: actions/checkout@v4
+
+      - name: Check out data branch (create it if missing)
+        run: |
+          if git ls-remote --exit-code --heads origin data >/dev/null 2>&1; then
+            git fetch origin data
+            git worktree add databranch origin/data
+            git -C databranch checkout -B data origin/data
+          else
+            git worktree add --orphan -b data databranch
+          fi
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests==2.32.3 pyyaml==6.0.2
+
+      - name: Fetch observations
+        env:
+          OHGO_API_KEY: ${{ secrets.OHGO_API_KEY }}
+        run: python scripts/fetch_rwis.py --out-dir databranch/data/obs
+
+      - name: Commit CSVs to data branch
+        working-directory: databranch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/obs
+          if git diff --cached --quiet; then
+            echo "Nothing new."
+            exit 0
+          fi
+          git commit -m "Add RWIS observations $(date -u +%Y-%m-%dT%H:%MZ)"
+          # The forecast workflow may push to `data` at the same time; if so,
+          # pull its commit in and try again.
+          for attempt in 1 2 3 4; do
+            git push origin data && exit 0
+            echo "push rejected (attempt $attempt); pulling and retrying"
+            git pull --rebase origin data
+            sleep $((attempt * 3))
+          done
+          exit 1

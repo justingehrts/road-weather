@@ -24,7 +24,9 @@ HRRR forcing ───────────┘
 - METRo runs on the runner's **system Python** (apt `python3-libxml2`), *not* the project's 3.11. `scripts/run_metro.py` runs on 3.11 and launches METRo as a separate process. Don't `pip install` METRo's dependencies into the 3.11 environment.
 - Pavement layer materials in `sites.yaml` must be one of METRo's four: asphalt, cement/concrete, crushed rock/gravel, sand.
 - METRo needs a few hours of observations (>=2 road-temperature readings, one within 4 h with a subsurface reading). Sites without enough are skipped with a message.
-- The workflow runs at 02, 08, 14 and 20 UTC (about 2 h after each HRRR cycle). If no complete HRRR run is found, METRo is skipped.
+- Observations are collected **hourly** by `.github/workflows/fetch-obs.yml` (OHGO only returns the latest reading, so history has to be built up on the `data` branch).
+- The forecast workflow (`forecast.yml`) runs at 02, 08, 14 and 20 UTC (about 2 h after each HRRR cycle). If no complete HRRR run is found, METRo is skipped.
+- Both workflows push to `data`, so each retries with a rebase if the push is rejected. The forecast workflow only writes `data/forcing` and `data/roadcast`; the hourly one only writes `data/obs`.
 
 ## Hard rules
 

@@ -1,6 +1,7 @@
 name: Road forecast pipeline
 
-# Fetch RWIS observations + HRRR forcing, run METRo, publish to the `data` branch.
+# Fetch HRRR forcing, run METRo on the stored observations (collected hourly
+# by fetch-obs.yml), publish to the `data` branch.
 #
 # NOTE: GitHub only runs `schedule:` triggers for the workflow file on the
 # default branch (main), so the schedule starts once this is merged. Scheduled
@@ -88,17 +89,20 @@ jobs:
         if: steps.metro-cache.outputs.cache-hit == 'true'
         run: cd "$METRO_DIR/metro/usr/bin" && /usr/bin/python3 ./metro --selftest --silent
 
-      # ---- data
-      - name: Fetch observations
-        id: rwis
-        env:
-          OHGO_API_KEY: ${{ secrets.OHGO_API_KEY }}
-        run: python scripts/fetch_rwis.py --out-dir databranch/data/obs
-
+      # ---- data (observations are collected hourly by fetch-obs.yml)
       - name: Fetch HRRR forcing (waits up to 60 min for forecast hour 48)
         id: hrrr
-        if: ${{ !cancelled() }}
         run: python scripts/fetch_hrrr.py --out-dir databranch/data/forcing
+
+      # The hourly observation workflow may have added readings while we waited
+      # for HRRR, so bring the data branch up to date before running METRo.
+      - name: Refresh data branch (pick up newest observations)
+        if: ${{ !cancelled() && steps.hrrr.outcome == 'success' }}
+        working-directory: databranch
+        run: |
+          git stash --include-untracked
+          git pull --ff-only origin data
+          git stash pop
 
       # Only runs when a complete HRRR run was found; otherwise METRo is skipped.
       - name: Run METRo
@@ -117,10 +121,18 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/obs data/forcing data/roadcast
+          git add data/forcing data/roadcast
           if git diff --cached --quiet; then
             echo "Nothing new."
-          else
-            git commit -m "Pipeline update $(date -u +%Y-%m-%dT%H:%MZ)"
-            git push origin data
+            exit 0
           fi
+          git commit -m "Add HRRR forcing and roadcasts $(date -u +%Y-%m-%dT%H:%MZ)"
+          # The hourly observation workflow may push at the same time; if so,
+          # pull its commit in and try again.
+          for attempt in 1 2 3 4; do
+            git push origin data && exit 0
+            echo "push rejected (attempt $attempt); pulling and retrying"
+            git pull --rebase origin data
+            sleep $((attempt * 3))
+          done
+          exit 1
