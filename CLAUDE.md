@@ -28,6 +28,12 @@ HRRR forcing ───────────┘
 - The forecast workflow (`forecast.yml`) runs at 02, 08, 14 and 20 UTC (about 2 h after each HRRR cycle). If no complete HRRR run is found, METRo is skipped.
 - Both workflows push to `data`, so each retries with a rebase if the push is rejected. The forecast workflow only writes `data/forcing` and `data/roadcast`; the hourly one only writes `data/obs`.
 
+## Streamlit app notes
+
+- Deploy it from `main` with entrypoint `app/streamlit_app.py` (Streamlit Community Cloud is free); set Python to 3.11 in the deploy settings.
+- The app finds the newest forecast through `data/latest.json`, then loads `data/flags/<cycle>.json`, `data/roadcast/<cycle>_<site>.csv` and `data/obs/<site>.csv` from `raw.githubusercontent.com/justingehrts/road-weather/data/`. Set `ROAD_WEATHER_DATA_URL` to point it somewhere else for testing.
+- Data stays in UTC; the app converts to Eastern only for display. Charts follow the data-viz palette rules (one temperature axis, validated colors, table view).
+
 ## Hard rules
 
 - **Everything runs on GitHub Actions.** The repo is public and uses free runners. No paid services, no paid APIs, no self-hosted infrastructure.
@@ -46,13 +52,15 @@ The owner is new to this. In **every PR description**, include a plain-language 
 
 Prefer small, focused PRs. Don't open a PR unless asked. Don't make sweeping changes without explaining them.
 
-## Repo layout (planned)
+## Repo layout
 
-- `sites.yaml`: the list of RWIS sites and their pavement layers (placeholders until real values are filled in).
-- `.github/workflows/`: scheduled forecast job and any checks.
-- `src/`: pipeline code (fetch observations, fetch forcing, run METRo, hazard flags, publish).
-- `app/`: Streamlit app (reads from the `data` branch only).
-- `data` branch: forecast output only; no source code.
+- `sites.yaml`: the list of RWIS sites, pavement layers, bridge pairings and traffic level (placeholders until real values are filled in).
+- `scripts/`: pipeline code. `fetch_rwis.py`, `fetch_hrrr.py`, `build_metro.sh`, `run_metro.py`, `flags.py`.
+- `docs/flags.md`: the hazard-flag rules (source of truth for `scripts/flags.py`; edit thresholds in `THRESHOLDS` at the top of that script).
+- `app/`: Streamlit app (`streamlit_app.py`, `charts.py`, `road_data.py`, `requirements.txt`). It only **reads** from the `data` branch via raw GitHub URLs.
+- `tests/`: pytest tests (`python -m pytest tests -q`). Run by `.github/workflows/tests.yml` on every PR.
+- `.github/workflows/`: `fetch-obs.yml` (hourly), `forecast.yml` (4x/day), `tests.yml`.
+- `data` branch: pipeline output only; no source code. `data/obs/`, `data/forcing/`, `data/roadcast/`, `data/flags/<cycle>.json`, and `data/latest.json` (pointer to the newest cycle that the app reads).
 
 ## Site configuration
 

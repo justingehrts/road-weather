@@ -1,7 +1,7 @@
 name: Road forecast pipeline
 
 # Fetch HRRR forcing, run METRo on the stored observations (collected hourly
-# by fetch-obs.yml), publish to the `data` branch.
+# by fetch-obs.yml), compute hazard flags, publish to the `data` branch.
 #
 # NOTE: GitHub only runs `schedule:` triggers for the workflow file on the
 # default branch (main), so the schedule starts once this is merged. Scheduled
@@ -114,6 +114,19 @@ jobs:
             --forcing-dir databranch/data/forcing \
             --out-dir databranch/data/roadcast
 
+      # Flags are computed for the SAME cycle HRRR just delivered, so an old
+      # roadcast from a failed run is never re-published as new.
+      - name: Compute hazard flags
+        if: ${{ !cancelled() && steps.hrrr.outcome == 'success' }}
+        run: |
+          CYCLE=$(ls databranch/data/forcing | sed -n 's/^hrrr_\([0-9]\{10\}z\)_.*/\1/p' | sort -u | tail -1)
+          echo "Flagging cycle $CYCLE"
+          python scripts/flags.py --cycle "$CYCLE" \
+            --roadcast-dir databranch/data/roadcast \
+            --forcing-dir databranch/data/forcing \
+            --out-dir databranch/data/flags \
+            --latest databranch/data/latest.json
+
       # Runs even if an earlier step failed, so whatever was fetched is saved.
       - name: Commit CSVs to data branch
         if: ${{ !cancelled() }}
@@ -121,12 +134,12 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/forcing data/roadcast
+          git add data/forcing data/roadcast data/flags data/latest.json
           if git diff --cached --quiet; then
             echo "Nothing new."
             exit 0
           fi
-          git commit -m "Add HRRR forcing and roadcasts $(date -u +%Y-%m-%dT%H:%MZ)"
+          git commit -m "Add HRRR forcing, roadcasts and flags $(date -u +%Y-%m-%dT%H:%MZ)"
           # The hourly observation workflow may push at the same time; if so,
           # pull its commit in and try again.
           for attempt in 1 2 3 4; do

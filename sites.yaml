@@ -14,6 +14,10 @@
 #                    METRo only knows 4 materials: asphalt, cement (or concrete),
 #                    crushed rock (or gravel), sand. For a road, METRo adds 20 m of
 #                    sand below your last layer automatically.
+#   paired_road_site (optional, bridges) id of a nearby ordinary road site. Used by
+#                    the "bridges first" flag (bridge freezes while that road doesn't).
+#   traffic        (optional) heavy | normal. Only "heavy" sites get the
+#                    "wheel-track glazing" flag. Defaults to normal.
 
 sites:
   - id: site_001
@@ -22,6 +26,7 @@ sites:
     lon: -83.20
     ohgo_site_id: "TODO"
     station_type: road
+    traffic: heavy
     pavement_layers:
       - { material: asphalt,  thickness_m: 0.10 }
       - { material: concrete, thickness_m: 0.25 }
@@ -33,6 +38,8 @@ sites:
     lon: -83.02
     ohgo_site_id: "TODO"
     station_type: bridge
+    paired_road_site: site_001   # placeholder pairing
+    traffic: heavy
     pavement_layers:
       - { material: asphalt,  thickness_m: 0.08 }
       - { material: cement,   thickness_m: 0.20 }
