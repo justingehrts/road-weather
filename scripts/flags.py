@@ -21,6 +21,7 @@ import argparse
 import bisect
 import csv
 import json
+import os
 import re
 import sys
 from datetime import datetime, timedelta, timezone
@@ -392,8 +393,11 @@ def main() -> int:
             forcings[sid] = Forcing(read_csv(fpath))
 
     if not roadcasts:
+        # Normal when METRo had nothing to run on (e.g. no observations yet): not an error.
         log(f"cycle {tag}: no usable roadcasts; nothing to flag")
-        return 1
+        if os.environ.get("GITHUB_ACTIONS"):
+            print(f"::warning::No hazard flags for cycle {tag}: there were no roadcasts to flag", file=sys.stderr)
+        return 0
 
     result_sites = {}
     for s in sites:

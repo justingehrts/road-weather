@@ -100,9 +100,12 @@ jobs:
         if: ${{ !cancelled() && steps.hrrr.outcome == 'success' }}
         working-directory: databranch
         run: |
-          git stash --include-untracked
-          git pull --ff-only origin data
-          git stash pop
+          # A brand-new `data` branch has no commits yet, so there is nothing to pull.
+          if git rev-parse --verify -q HEAD >/dev/null 2>&1; then
+            git pull --ff-only origin data
+          else
+            echo "data branch is new; nothing to refresh"
+          fi
 
       # Only runs when a complete HRRR run was found; otherwise METRo is skipped.
       - name: Run METRo

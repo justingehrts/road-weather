@@ -77,6 +77,11 @@ def log(msg: str) -> None:
     print(msg, file=sys.stderr, flush=True)
 
 
+def warn(msg: str) -> None:
+    """A yellow warning in the GitHub Actions run (plain text elsewhere)."""
+    print(f"::warning::{msg}" if os.environ.get("GITHUB_ACTIONS") else f"warning: {msg}", file=sys.stderr, flush=True)
+
+
 # ----------------------------------------------------------------- helpers
 def f_to_c(f: float) -> float:
     return (f - 32.0) * 5.0 / 9.0
@@ -406,7 +411,10 @@ def main() -> int:
             log(f"{sid}: ERROR running METRo - {exc}")
 
     log(f"done: {written} written, {skipped} skipped (not enough data), {errors} errors")
-    return 0 if written > 0 and errors == 0 else 1
+    if written == 0 and errors == 0 and skipped:
+        # Expected until observations have been collected: not a failure, but make it visible.
+        warn(f"METRo produced no roadcasts: all {skipped} site(s) were skipped for lack of observations or forcing")
+    return 1 if errors else 0
 
 
 if __name__ == "__main__":
