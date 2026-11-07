@@ -1,0 +1,80 @@
+name: Verify forecasts (daily)
+
+# Once a day, compare past roadcasts and hazard flags with the RWIS observations
+# that came later, and publish data/verification/summary.json for the app.
+#
+# NOTE: GitHub only runs `schedule:` triggers for the workflow file on the
+# default branch (main), so the daily schedule starts once this is merged.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "37 11 * * *"   # 11:37 UTC = early morning in Ohio; any quiet time works
+
+permissions:
+  contents: write   # needed to push the summary to the `data` branch
+
+# Own concurrency group; this job only writes data/verification, so it never
+# blocks the hourly observation or the forecast runs.
+concurrency:
+  group: verify
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out code (main)
+        uses: actions/checkout@v4
+
+      - name: Check out data branch
+        id: data
+        run: |
+          if git ls-remote --exit-code --heads origin data >/dev/null 2>&1; then
+            git fetch origin data
+            git worktree add databranch origin/data
+            git -C databranch checkout -B data origin/data
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No data branch yet (the pipeline has not run); nothing to verify."
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/setup-python@v5
+        if: steps.data.outputs.exists == 'true'
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        if: steps.data.outputs.exists == 'true'
+        run: pip install pyyaml==6.0.2
+
+      - name: Verify forecasts against observations
+        if: steps.data.outputs.exists == 'true'
+        run: |
+          python scripts/verify.py \
+            --roadcast-dir databranch/data/roadcast \
+            --flags-dir databranch/data/flags \
+            --obs-dir databranch/data/obs \
+            --out databranch/data/verification/summary.json
+
+      - name: Commit summary to data branch
+        if: steps.data.outputs.exists == 'true'
+        working-directory: databranch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [ -e data/verification ]; then git add data/verification; fi
+          if git diff --cached --quiet; then
+            echo "Nothing new."
+            exit 0
+          fi
+          git commit -m "Update verification summary $(date -u +%Y-%m-%dT%H:%MZ)"
+          # Other workflows may push to `data` at the same time; if so, pull and retry.
+          for attempt in 1 2 3 4; do
+            git push origin data && exit 0
+            echo "push rejected (attempt $attempt); pulling and retrying"
+            git pull --rebase origin data
+            sleep $((attempt * 3))
+          done
+          exit 1

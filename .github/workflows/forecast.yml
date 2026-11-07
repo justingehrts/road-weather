@@ -1,0 +1,157 @@
+name: Road forecast pipeline
+
+# Fetch HRRR forcing, run METRo on the stored observations (collected hourly
+# by fetch-obs.yml), compute hazard flags, publish to the `data` branch.
+#
+# NOTE: GitHub only runs `schedule:` triggers for the workflow file on the
+# default branch (main), so the schedule starts once this is merged. Scheduled
+# runs can also start a few minutes late.
+on:
+  workflow_dispatch:
+  schedule:
+    # 02, 08, 14, 20 UTC: about 2 h after each HRRR cycle (00/06/12/18Z), when
+    # forecast hour 48 is usually just becoming available. fetch_hrrr.py then
+    # waits/retries for up to 60 min. Cron is UTC, so daylight saving is moot.
+    - cron: "0 2,8,14,20 * * *"
+
+permissions:
+  contents: write   # needed to push CSVs to the `data` branch
+
+concurrency:
+  group: data-branch-writes
+  cancel-in-progress: false
+
+env:
+  METRO_DIR: ${{ github.workspace }}/metro-build
+
+jobs:
+  forecast:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150   # HRRR step may wait up to 60 min for f48
+    steps:
+      - name: Check out code (main)
+        uses: actions/checkout@v4
+
+      - name: Check out data branch (create it if missing)
+        run: |
+          if git ls-remote --exit-code --heads origin data >/dev/null 2>&1; then
+            git fetch origin data
+            git worktree add databranch origin/data
+            git -C databranch checkout -B data origin/data
+          else
+            git worktree add --orphan -b data databranch
+          fi
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python dependencies
+        run: pip install requests==2.32.3 pyyaml==6.0.2 herbie-data==2026.10.0 cfgrib==0.9.15.1 eccodes==2.50.0
+
+      # ---- METRo: needs the SYSTEM python (apt libxml2 bindings), not the 3.11 above
+      - name: Install METRo runtime packages (apt)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq python3-libxml2 python3-numpy libgfortran5
+
+      - name: Identify system Python (for the cache key)
+        id: sys
+        run: |
+          echo "py=$(/usr/bin/python3 -c 'import sys; print("%d.%d" % sys.version_info[:2])')" >> "$GITHUB_OUTPUT"
+
+      - name: Restore METRo build cache
+        id: metro-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: metro-build
+          # Rebuilds if the build script/patch changes, or the system Python
+          # (which the compiled METRo model is tied to) changes. The image
+          # version is deliberately NOT in the key: runner images update weekly
+          # and would force a rebuild each time; the selftest step below
+          # catches a cache that no longer works.
+          key: metro-4.0.1-${{ steps.sys.outputs.py }}-${{ hashFiles('scripts/build_metro.sh', 'scripts/metro_patches/*') }}
+
+      - name: Build METRo (cache miss only)
+        if: steps.metro-cache.outputs.cache-hit != 'true'
+        run: |
+          sudo apt-get install -y -qq gfortran swig python3-dev patch cpio
+          scripts/build_metro.sh "$METRO_DIR"
+
+      - name: Save METRo build cache
+        if: steps.metro-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: metro-build
+          key: ${{ steps.metro-cache.outputs.cache-primary-key }}
+
+      - name: Check cached METRo still runs
+        if: steps.metro-cache.outputs.cache-hit == 'true'
+        run: cd "$METRO_DIR/metro/usr/bin" && /usr/bin/python3 ./metro --selftest --silent
+
+      # ---- data (observations are collected hourly by fetch-obs.yml)
+      - name: Fetch HRRR forcing (waits up to 60 min for forecast hour 48)
+        id: hrrr
+        run: python scripts/fetch_hrrr.py --out-dir databranch/data/forcing
+
+      # The hourly observation workflow may have added readings while we waited
+      # for HRRR, so bring the data branch up to date before running METRo.
+      - name: Refresh data branch (pick up newest observations)
+        if: ${{ !cancelled() && steps.hrrr.outcome == 'success' }}
+        working-directory: databranch
+        run: |
+          # A brand-new `data` branch has no commits yet, so there is nothing to pull.
+          if git rev-parse --verify -q HEAD >/dev/null 2>&1; then
+            git pull --ff-only origin data
+          else
+            echo "data branch is new; nothing to refresh"
+          fi
+
+      # Only runs when a complete HRRR run was found; otherwise METRo is skipped.
+      - name: Run METRo
+        if: ${{ !cancelled() && steps.hrrr.outcome == 'success' }}
+        run: |
+          python scripts/run_metro.py \
+            --metro-dir "$METRO_DIR/metro" \
+            --obs-dir databranch/data/obs \
+            --forcing-dir databranch/data/forcing \
+            --out-dir databranch/data/roadcast
+
+      # Flags are computed for the SAME cycle HRRR just delivered, so an old
+      # roadcast from a failed run is never re-published as new.
+      - name: Compute hazard flags
+        if: ${{ !cancelled() && steps.hrrr.outcome == 'success' }}
+        run: |
+          CYCLE=$(ls databranch/data/forcing | sed -n 's/^hrrr_\([0-9]\{10\}z\)_.*/\1/p' | sort -u | tail -1)
+          echo "Flagging cycle $CYCLE"
+          python scripts/flags.py --cycle "$CYCLE" \
+            --roadcast-dir databranch/data/roadcast \
+            --forcing-dir databranch/data/forcing \
+            --out-dir databranch/data/flags \
+            --latest databranch/data/latest.json
+
+      # Runs even if an earlier step failed, so whatever was fetched is saved.
+      - name: Commit CSVs to data branch
+        if: ${{ !cancelled() }}
+        working-directory: databranch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # `git add` errors on a path that does not exist (e.g. no roadcast this run), so add only what exists.
+          for p in data/forcing data/roadcast data/flags data/latest.json; do
+            if [ -e "$p" ]; then git add "$p"; fi
+          done
+          if git diff --cached --quiet; then
+            echo "Nothing new."
+            exit 0
+          fi
+          git commit -m "Add HRRR forcing, roadcasts and flags $(date -u +%Y-%m-%dT%H:%MZ)"
+          # The hourly observation workflow may push at the same time; if so,
+          # pull its commit in and try again.
+          for attempt in 1 2 3 4; do
+            git push origin data && exit 0
+            echo "push rejected (attempt $attempt); pulling and retrying"
+            git pull --rebase origin data
+            sleep $((attempt * 3))
+          done
+          exit 1
