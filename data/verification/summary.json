@@ -1,0 +1,80 @@
+{
+  "generated_utc": "2026-11-07T16:59:07Z",
+  "window_days": 30,
+  "lead_bins": [
+    "0-6",
+    "6-12",
+    "12-18",
+    "18-24",
+    "24-30",
+    "30-36",
+    "36-42",
+    "42-48"
+  ],
+  "cycles_verified": 0,
+  "matched_pairs": 0,
+  "temperature": {
+    "road_temp_f": {
+      "label": "Road surface temperature",
+      "overall_by_lead": [],
+      "by_site": {}
+    },
+    "air_temp_f": {
+      "label": "Air temperature",
+      "overall_by_lead": [],
+      "by_site": {}
+    }
+  },
+  "flags": {
+    "condition_data": {
+      "observations": 0,
+      "with_surface_condition": 0
+    },
+    "by_flag": {
+      "pavement_frost": {
+        "name": "Pavement frost",
+        "verified_against": "RWIS surface condition reports frost",
+        "overall": null,
+        "by_site": {}
+      },
+      "black_ice": {
+        "name": "Black ice / refreeze",
+        "verified_against": "RWIS surface condition reports ice / black ice",
+        "overall": null,
+        "by_site": {}
+      },
+      "flash_freeze": {
+        "name": "Flash freeze",
+        "verified_against": "RWIS condition changes from wet to ice within 3 h",
+        "overall": null,
+        "by_site": {}
+      },
+      "wheel_track_glazing": {
+        "name": "Wheel-track glazing",
+        "verified_against": "RWIS surface condition reports ice or snow (crash/traffic-speed data not available)",
+        "overall": null,
+        "by_site": {}
+      },
+      "bridges_first": {
+        "name": "Bridges first",
+        "verified_against": "Observed bridge road temp at or below 32F while its paired road site is above 32F",
+        "overall": null,
+        "by_site": {}
+      },
+      "freezing_rain": {
+        "name": "Freezing rain",
+        "verified_against": "RWIS surface condition reports ice (precipitation type is not observed)",
+        "overall": null,
+        "by_site": {}
+      }
+    },
+    "not_verified": {
+      "Salt struggles": "Qualitative rule: there is no RWIS measurement to check it against."
+    },
+    "definitions": {
+      "hit_rate": "Of the times the hazard was observed, the share that had the flag on (higher is better).",
+      "false_alarm_ratio": "Of the times the flag was on, the share where the hazard was not observed (lower is better).",
+      "false_alarm_rate": "Of the times the hazard was not observed, the share where the flag was on (lower is better)."
+    }
+  }
+}
