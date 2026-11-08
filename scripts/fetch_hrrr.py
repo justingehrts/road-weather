@@ -4,7 +4,8 @@
 Rules this script enforces:
   * Only the synoptic cycles 00, 06, 12 and 18Z are used (they are the only
     HRRR runs that go out to 48 hours). Never an off-hour cycle.
-  * The target is the most recent such cycle, and only once forecast hour 48
+  * The target is the most recent such cycle that started at least 2 hours ago
+    (younger ones cannot be complete yet), and only once forecast hour 48
     is available on AWS (checked via the GRIB .idx inventory). If it is not
     there yet we wait 10 minutes and retry, giving up after 60 minutes.
   * No partial runs: all of f00..f48 must download and parse for every field
@@ -33,6 +34,11 @@ SYNOPTIC_HOURS = (0, 6, 12, 18)
 LAST_FXX = 48
 WAIT_MINUTES = 10
 GIVE_UP_MINUTES = 60
+# HRRR needs about two hours after a cycle's start time before forecast hour 48
+# exists on AWS. Never target a cycle younger than this: waiting on it is
+# pointless, and a run that GitHub starts late would otherwise skip a complete
+# cycle in favour of one that cannot be ready yet.
+MIN_CYCLE_AGE = timedelta(hours=2)
 DOWNLOAD_ATTEMPTS = 5          # per forecast hour; AWS S3 sometimes answers 503 for a moment
 RETRY_WAIT_SECONDS = 5         # doubles each time: 5, 10, 20, 40
 
@@ -74,10 +80,13 @@ def log(msg: str) -> None:
     print(msg, file=sys.stderr, flush=True)
 
 
-def latest_cycle(now: datetime) -> datetime:
-    """Most recent 00/06/12/18Z cycle at or before `now` (UTC)."""
+def latest_cycle(now: datetime, min_age: timedelta = MIN_CYCLE_AGE) -> datetime:
+    """Most recent 00/06/12/18Z cycle that started at least `min_age` ago (UTC)."""
     hour = max(h for h in SYNOPTIC_HOURS if h <= now.hour)
-    return now.replace(hour=hour, minute=0, second=0, microsecond=0)
+    cycle = now.replace(hour=hour, minute=0, second=0, microsecond=0)
+    while cycle + min_age > now:
+        cycle -= timedelta(hours=6)
+    return cycle
 
 
 def make_herbie(cycle: datetime, fxx: int, cache_dir: Path):

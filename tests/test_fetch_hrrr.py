@@ -54,12 +54,33 @@ def test_no_retry_wait_when_first_attempt_works(monkeypatch, no_sleep):
     assert calls == [False] and no_sleep == []
 
 
-@pytest.mark.parametrize("now,expected_hour", [
-    (datetime(2026, 11, 6, 20, 10, tzinfo=timezone.utc), 18),
-    (datetime(2026, 11, 6, 2, 5, tzinfo=timezone.utc), 0),
-    (datetime(2026, 11, 6, 8, 0, tzinfo=timezone.utc), 6),
-    (datetime(2026, 11, 6, 17, 59, tzinfo=timezone.utc), 12),
+@pytest.mark.parametrize("now,expected", [
+    # normal on-time runs: about two hours after the cycle
+    (datetime(2026, 11, 6, 20, 10, tzinfo=timezone.utc), datetime(2026, 11, 6, 18, tzinfo=timezone.utc)),
+    (datetime(2026, 11, 6, 2, 5, tzinfo=timezone.utc), datetime(2026, 11, 6, 0, tzinfo=timezone.utc)),
+    (datetime(2026, 11, 6, 8, 0, tzinfo=timezone.utc), datetime(2026, 11, 6, 6, tzinfo=timezone.utc)),
+    # a run that GitHub started late still gets the newest cycle that is old enough
+    (datetime(2026, 11, 7, 23, 12, tzinfo=timezone.utc), datetime(2026, 11, 7, 18, tzinfo=timezone.utc)),
 ])
-def test_only_synoptic_cycles_are_chosen(now, expected_hour):
-    c = fetch_hrrr.latest_cycle(now)
-    assert c.hour == expected_hour and c.minute == 0
+def test_on_time_and_late_runs_pick_the_newest_cycle_old_enough(now, expected):
+    assert fetch_hrrr.latest_cycle(now) == expected
+
+
+@pytest.mark.parametrize("now,expected", [
+    # the failure on GitHub: run started 34 min after the 18Z cycle, which cannot be complete for ~2 h
+    (datetime(2026, 11, 8, 18, 34, tzinfo=timezone.utc), datetime(2026, 11, 8, 12, tzinfo=timezone.utc)),
+    (datetime(2026, 11, 8, 17, 59, tzinfo=timezone.utc), datetime(2026, 11, 8, 12, tzinfo=timezone.utc)),
+    (datetime(2026, 11, 8, 19, 59, tzinfo=timezone.utc), datetime(2026, 11, 8, 12, tzinfo=timezone.utc)),
+    (datetime(2026, 11, 8, 20, 0, tzinfo=timezone.utc), datetime(2026, 11, 8, 18, tzinfo=timezone.utc)),
+    # and across midnight
+    (datetime(2026, 11, 8, 1, 30, tzinfo=timezone.utc), datetime(2026, 11, 7, 18, tzinfo=timezone.utc)),
+])
+def test_a_cycle_younger_than_two_hours_is_never_targeted(now, expected):
+    assert fetch_hrrr.latest_cycle(now) == expected
+
+
+def test_only_synoptic_cycles_are_ever_chosen():
+    for hour in range(24):
+        for minute in (0, 30):
+            c = fetch_hrrr.latest_cycle(datetime(2026, 11, 8, hour, minute, tzinfo=timezone.utc))
+            assert c.hour in (0, 6, 12, 18) and c.minute == 0
