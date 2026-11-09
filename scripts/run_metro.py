@@ -43,6 +43,10 @@ import yaml
 
 MISSING = "9999"  # METRo's code for a missing observation value
 OBS_WINDOW_HOURS = 12  # METRo wants 3 h minimum, ideally 12 h of observations
+# Many OHGO sites have no working subsurface sensor, but METRo insists on a subsurface (40 cm) temperature. Its docs
+# allow a pseudo-observation, so a road site with none gets the mean road temperature of the last 24 h (the
+# ground at 40 cm changes slowly, so a day's average is a reasonable stand-in).
+SUBSURFACE_ESTIMATE_HOURS = 24
 STATION_TZ = "EST5EDT"  # Ohio
 
 # Pavement material names -> the four types METRo accepts.
@@ -236,6 +240,15 @@ def select_observations(rows: list[dict], cycle: datetime, site: dict) -> list[d
     # Drop duplicate minutes (keep the last).
     window = list({o["ts"]: o for o in window}.values())
 
+    # No subsurface reading at all (no sensor, or it is offline): use the recent mean road temperature.
+    if not any(o["sst"] is not None for o in window):
+        recent = [o["st"] for o in parsed
+                  if o["st"] is not None and o["ts"] > latest - timedelta(hours=SUBSURFACE_ESTIMATE_HOURS)]
+        if recent:
+            estimate = sum(recent) / len(recent)
+            for o in window:
+                o["sst"], o["sst_estimated"] = estimate, True
+
     # METRo's own acceptance rules (see its "Input observation" docs). Checked
     # here so a skipped site gets a plain-English reason, not a METRo traceback.
     with_st = [o for o in window if o["st"] is not None]
@@ -400,6 +413,9 @@ def main() -> int:
             log(f"{sid}: ERROR preparing inputs - {exc}")
             continue
         try:
+            if any(o.get("sst_estimated") for o in obs):
+                log(f"{sid}: no subsurface sensor reading; using the 24 h mean road temperature "
+                    f"({obs[-1]['sst'] * 9 / 5 + 32:.1f} F) as the subsurface estimate")
             roadcast_xml = work / "roadcast.xml"
             roadcast_xml.unlink(missing_ok=True)
             run_metro(args.metro_dir, args.metro_python, work, roadcast_xml)
