@@ -1,0 +1,98 @@
+diff --git a/src/frontend/data_module/metro_data.py b/src/frontend/data_module/metro_data.py
+index 98ef883..47f1ba5 100644
+--- a/src/frontend/data_module/metro_data.py
++++ b/src/frontend/data_module/metro_data.py
+@@ -98,7 +98,7 @@ class Metro_data:
+ 
+         self.bRead_only = False
+         self.dHeader = {}
+-        self.npMatrix = numpy.array([], dtype=numpy.float)
++        self.npMatrix = numpy.array([], dtype=float)
+ 
+         # Name of the columns of the matrix
+         self.lMatrix_std_col_name = []
+diff --git a/src/frontend/executable_module/metro_preprocess_combine.py b/src/frontend/executable_module/metro_preprocess_combine.py
+index a6c1a71..9d44ca4 100644
+--- a/src/frontend/executable_module/metro_preprocess_combine.py
++++ b/src/frontend/executable_module/metro_preprocess_combine.py
+@@ -312,7 +312,7 @@ class Metro_preprocess_combine(Metro_preprocess):
+ 
+         # Create the array
+         npAH = numpy.zeros(npLenAH)
+-        npAH = npAH.astype(numpy.float)
++        npAH = npAH.astype(float)
+ 
+         for i in range(0, npLenAH):
+             npAH[i] = metro_physics.foqst(npTD[i] + metro_constant.fTcdk, npAP[i])
+diff --git a/src/frontend/executable_module/metro_preprocess_interpol_forecast.py b/src/frontend/executable_module/metro_preprocess_interpol_forecast.py
+index 5a7f270..1033d2e 100644
+--- a/src/frontend/executable_module/metro_preprocess_interpol_forecast.py
++++ b/src/frontend/executable_module/metro_preprocess_interpol_forecast.py
+@@ -104,8 +104,8 @@ class Metro_preprocess_interpol_forecast(Metro_preprocess):
+         npFT = wf_original_data.get_matrix_col('FORECAST_TIME')
+         nHourStart = int(metro_date.get_hour(npFT[0]))
+         nbrHours = metro_date.get_elapsed_time(npFT[-1], npFT[0]) + 1
+-        self.npTime = numpy.arange(0, nbrHours, dtype=numpy.float) * 3600
+-        npTimeAtHours = numpy.arange(0, nbrHours, dtype=numpy.float) + nHourStart
++        self.npTime = numpy.arange(0, nbrHours, dtype=float) * 3600
++        npTimeAtHours = numpy.arange(0, nbrHours, dtype=float) + nHourStart
+         wf_controlled_data.append_matrix_col('Hour', npTimeAtHours)
+ 
+     def __interpolate_FT(self, wf_original_data, wf_controlled_data, wf_interpolated_data):
+diff --git a/src/frontend/toolbox/metro_physics.py b/src/frontend/toolbox/metro_physics.py
+index f2f09ff..018953f 100644
+--- a/src/frontend/toolbox/metro_physics.py
++++ b/src/frontend/toolbox/metro_physics.py
+@@ -113,8 +113,8 @@ def get_sf(npCloudsOctal, npTimeHour, npForecastedTime, fSunriseTimeUTC, fSunset
+         Return npSF (numpy array): Array containing the solar flux.
+      """
+     nTimeHourLength = len(npCloudsOctal)
+-    npSft = numpy.zeros(nTimeHourLength, dtype=numpy.float)
+-    npCoeff = numpy.zeros(nTimeHourLength, dtype=numpy.float)
++    npSft = numpy.zeros(nTimeHourLength, dtype=float)
++    npCoeff = numpy.zeros(nTimeHourLength, dtype=float)
+ 
+     for i in range(len(npForecastedTime)):
+         cTime = npForecastedTime[i]
+diff --git a/src/frontend/toolbox/metro_util.py b/src/frontend/toolbox/metro_util.py
+index a4f4387..3f2f3a3 100644
+--- a/src/frontend/toolbox/metro_util.py
++++ b/src/frontend/toolbox/metro_util.py
+@@ -58,7 +58,36 @@ elif 'LC_ALL' in os.environ:
+         os.environ['LC_ALL'] = 'en'
+ 
+ import sys
+-from distutils.version import LooseVersion
++try:
++    from distutils.version import LooseVersion
++except ImportError:  # distutils was removed in Python 3.12
++    import re as _re
++
++    class LooseVersion(object):
++        """Minimal stand-in for distutils.version.LooseVersion."""
++        def __init__(self, vstring):
++            self.vstring = str(vstring)
++            self.version = [int(x) if x.isdigit() else x
++                            for x in _re.split(r"(\d+|[a-z]+|\.)", self.vstring)
++                            if x and x != "."]
++
++        def _cmp(self, other):
++            if not isinstance(other, LooseVersion):
++                other = LooseVersion(other)
++            a, b = self.version, other.version
++            return (a > b) - (a < b)
++
++        def __str__(self):
++            return self.vstring
++
++        def __lt__(self, other):
++            return self._cmp(other) < 0
++
++        def __gt__(self, other):
++            return self._cmp(other) > 0
++
++        def __eq__(self, other):
++            return self._cmp(other) == 0
+ from gettext import gettext as _
+ import gettext
+ import numpy

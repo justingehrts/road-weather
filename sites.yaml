@@ -1,45 +1,161 @@
 # RWIS sites near Columbus, Ohio.
 #
-# !! ALL ENTRIES ARE PLACEHOLDERS !!
-# Names, coordinates, ohgo_site_id values and pavement layers below are
-# made-up examples. Replace them with real values before trusting any forecast.
+# The OHGO site ids, coordinates and counties below are REAL (taken from OHGO's API on 2026-11-09; every
+# site had a pavement sensor reporting a temperature at that moment). Site 200053 (I-70 WB at Buena Vista Rd)
+# was deliberately left out.
+#
+# !! STILL GENERIC GUESSES !!  The pavement layers, station types and traffic levels below are not
+# known yet. All sites use METRo's own example road (8 in of asphalt over 18 in of crushed rock) and are
+# treated as ordinary roads. Replace them with real values (ODOT may have them) before trusting any forecast.
 #
 # Fields:
-#   id             short stable identifier (lowercase, no spaces)
+#   id             short stable identifier (lowercase, no spaces); here "rwis_" + the OHGO id
 #   name           human-readable name
-#   lat, lon       decimal degrees (WGS84)
-#   ohgo_site_id   site ID in the OHGO RWIS API (TODO: look up)
+#   lat, lon       decimal degrees (WGS84), as reported by OHGO (about 10 m precision)
+#   ohgo_site_id   site ID in the OHGO RWIS API (a number, kept as text)
 #   station_type   road | bridge
 #   pavement_layers  list ordered top -> bottom; each has material + thickness_m
+#                    METRo only knows 4 materials: asphalt, cement (or concrete),
+#                    crushed rock (or gravel), sand. For a road, METRo adds 20 m of
+#                    sand below your last layer automatically.
+#   paired_road_site (optional, bridges) id of a nearby ordinary road site. Used by
+#                    the "bridges first" flag (bridge freezes while that road doesn't).
+#   traffic        (optional) heavy | normal. Only "heavy" sites get the
+#                    "wheel-track glazing" flag. Defaults to normal. Here: Interstate sites are
+#                    "heavy" and everything else is left as normal (a guess).
 
 sites:
-  - id: site_001
-    name: "PLACEHOLDER - I-70 West of Columbus"
-    lat: 39.96
-    lon: -83.20
-    ohgo_site_id: "TODO"
+  - id: rwis_38010
+    name: "US 33 at Hamilton Rd, Franklin Co."
+    lat: 39.8888
+    lon: -82.8826
+    ohgo_site_id: "38010"
     station_type: road
-    pavement_layers:
-      - { material: asphalt,  thickness_m: 0.10 }
-      - { material: concrete, thickness_m: 0.25 }
-      - { material: gravel,   thickness_m: 0.30 }
+    pavement_layers:   # generic guess (METRo's example road)
+      - { material: asphalt,      thickness_m: 0.20 }
+      - { material: crushed rock, thickness_m: 0.45 }
 
-  - id: site_002
-    name: "PLACEHOLDER - I-270 North Outerbelt Bridge"
-    lat: 40.10
-    lon: -83.02
-    ohgo_site_id: "TODO"
-    station_type: bridge
-    pavement_layers:
-      - { material: concrete, thickness_m: 0.20 }
-      - { material: steel,    thickness_m: 0.02 }
-
-  - id: site_003
-    name: "PLACEHOLDER - I-71 South of Columbus"
-    lat: 39.85
-    lon: -83.00
-    ohgo_site_id: "TODO"
+  - id: rwis_200061
+    name: "I-270 at Cemetery Rd, Franklin Co."
+    lat: 40.0331
+    lon: -83.1245
+    ohgo_site_id: "200061"
     station_type: road
-    pavement_layers:
-      - { material: asphalt, thickness_m: 0.15 }
-      - { material: gravel,  thickness_m: 0.35 }
+    traffic: heavy
+    pavement_layers:   # generic guess (METRo's example road)
+      - { material: asphalt,      thickness_m: 0.20 }
+      - { material: crushed rock, thickness_m: 0.45 }
+
+  - id: rwis_200181
+    name: "I-71 at SR 665, Franklin Co."
+    lat: 39.8445
+    lon: -83.0879
+    ohgo_site_id: "200181"
+    station_type: road
+    traffic: heavy
+    pavement_layers:   # generic guess (METRo's example road)
+      - { material: asphalt,      thickness_m: 0.20 }
+      - { material: crushed rock, thickness_m: 0.45 }
+
+  - id: rwis_200015
+    name: "SR 752 at railroad overpass, Pickaway Co."
+    lat: 39.7238
+    lon: -82.9619
+    ohgo_site_id: "200015"
+    station_type: road
+    pavement_layers:   # generic guess (METRo's example road)
+      - { material: asphalt,      thickness_m: 0.20 }
+      - { material: crushed rock, thickness_m: 0.45 }
+
+  - id: rwis_38005
+    name: "I-70 at SR 29, Madison Co."
+    lat: 39.9599
+    lon: -83.3449
+    ohgo_site_id: "38005"
+    station_type: road
+    traffic: heavy
+    pavement_layers:   # generic guess (METRo's example road)
+      - { material: asphalt,      thickness_m: 0.20 }
+      - { material: crushed rock, thickness_m: 0.45 }
+
+  - id: rwis_38000
+    name: "I-71 at US 36, Delaware Co."
+    lat: 40.2670
+    lon: -82.9279
+    ohgo_site_id: "38000"
+    station_type: road
+    traffic: heavy
+    pavement_layers:   # generic guess (METRo's example road)
+      - { material: asphalt,      thickness_m: 0.20 }
+      - { material: crushed rock, thickness_m: 0.45 }
+
+  - id: rwis_200011
+    name: "SR 188 at US 33, Fairfield Co."
+    lat: 39.7181
+    lon: -82.6744
+    ohgo_site_id: "200011"
+    station_type: road
+    pavement_layers:   # generic guess (METRo's example road)
+      - { material: asphalt,      thickness_m: 0.20 }
+      - { material: crushed rock, thickness_m: 0.45 }
+
+  - id: rwis_200060
+    name: "I-71 at CR 9, Madison Co."
+    lat: 39.7266
+    lon: -83.3854
+    ohgo_site_id: "200060"
+    station_type: road   # CHECK: the I-71 bridges over North Fork Paint Creek are 30-40 m away; is the sensor on a bridge deck?
+    traffic: heavy
+    pavement_layers:   # generic guess (METRo's example road)
+      - { material: asphalt,      thickness_m: 0.20 }
+      - { material: crushed rock, thickness_m: 0.45 }
+
+  - id: rwis_200013
+    name: "SR 13 at Sheridan Rd, Perry Co."
+    lat: 39.8319
+    lon: -82.3766
+    ohgo_site_id: "200013"
+    station_type: road
+    pavement_layers:   # generic guess (METRo's example road)
+      - { material: asphalt,      thickness_m: 0.20 }
+      - { material: crushed rock, thickness_m: 0.45 }
+
+  - id: rwis_200017
+    name: "US 33 at SR 739, Union Co."
+    lat: 40.2767
+    lon: -83.5367
+    ohgo_site_id: "200017"
+    station_type: road
+    pavement_layers:   # generic guess (METRo's example road)
+      - { material: asphalt,      thickness_m: 0.20 }
+      - { material: crushed rock, thickness_m: 0.45 }
+
+  - id: rwis_200012
+    name: "SR 13, milepost 3.66, Knox Co."
+    lat: 40.2965
+    lon: -82.4533
+    ohgo_site_id: "200012"
+    station_type: road
+    pavement_layers:   # generic guess (METRo's example road)
+      - { material: asphalt,      thickness_m: 0.20 }
+      - { material: crushed rock, thickness_m: 0.45 }
+
+  - id: rwis_38015
+    name: "SR 4 at SR 203, Marion Co."
+    lat: 40.4842
+    lon: -83.1909
+    ohgo_site_id: "38015"
+    station_type: road
+    pavement_layers:   # generic guess (METRo's example road)
+      - { material: asphalt,      thickness_m: 0.20 }
+      - { material: crushed rock, thickness_m: 0.45 }
+
+  - id: rwis_200014
+    name: "US 35 at SR 62, Fayette Co."
+    lat: 39.5237
+    lon: -83.4603
+    ohgo_site_id: "200014"
+    station_type: road
+    pavement_layers:   # generic guess (METRo's example road)
+      - { material: asphalt,      thickness_m: 0.20 }
+      - { material: crushed rock, thickness_m: 0.45 }
