@@ -4,19 +4,12 @@ name: Fetch RWIS observations (hourly)
 # latest one. So we collect one reading per site every hour and keep them on
 # the `data` branch. The forecast workflow reads them from there.
 #
-# PAUSED: the hourly schedule is switched off until an OHGO API key exists
-# (every run would fail with "OHGO_API_KEY is not set"). It can still be run
-# by hand from the Actions tab. To turn the hourly runs back on:
-#   1. add the OHGO_API_KEY secret (Settings > Secrets and variables > Actions),
-#   2. fill in real ohgo_site_id values in sites.yaml,
-#   3. delete the "#" at the start of the two schedule lines below.
-#
 # NOTE: GitHub only runs `schedule:` triggers for the workflow file on the
 # default branch, so the schedule takes effect once this is merged to it.
 on:
   workflow_dispatch:
-  # schedule:
-  #   - cron: "20 * * * *"   # minute 20, to avoid GitHub's busy top-of-hour queue
+   schedule:
+     - cron: "20 * * * *"   # minute 20, to avoid GitHub's busy top-of-hour queue
 
 permissions:
   contents: write   # needed to push CSVs to the `data` branch
