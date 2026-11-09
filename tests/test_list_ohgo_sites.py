@@ -124,3 +124,19 @@ def test_non_json_answers_do_not_crash(monkeypatch):
     monkeypatch.setattr(lo.requests, "get", lambda *a, **k: FakeResp(200, None, text="<html>oops</html>"))
     sites, attempts = lo.fetch_sites("k")
     assert sites == [] and "oops" in attempts[0]["preview"]
+
+
+def test_sites_without_a_pavement_sensor_are_marked_and_left_out_of_the_snippet():
+    near = lo.nearby(SITES, lo.COLUMBUS, 40)            # 88-3 has no sensors; 55-1 has a pavement sensor
+    assert lo.pavement_temp(SITES[0]) == 44.1 and lo.pavement_temp(SITES[1]) is None
+    text = lo.report(SITES, near, 40)
+    assert "1 of these 2 sites have a pavement sensor" in text
+    assert "**none**" in text and "Left out (no pavement sensor): `88-3`" in text
+    snippet = text.split("```yaml")[1].split("```")[0]
+    assert "55-1" in snippet and "88-3" not in snippet
+
+
+def test_pavement_temp_ignores_garbage_readings():
+    assert lo.pavement_temp({"SurfaceSensors": [{"SurfaceTemperature": -148.0}, {"SurfaceTemperature": 40.5}]}) == 40.5
+    assert lo.pavement_temp({"SurfaceSensors": [{"SurfaceTemperature": 9999}]}) is None
+    assert lo.pavement_temp({"SurfaceSensors": []}) is None

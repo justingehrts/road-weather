@@ -101,6 +101,19 @@ def nearby(sites: list[dict], center: tuple[float, float], radius_miles: float) 
     return sorted(out, key=lambda s: s["miles"])
 
 
+def pavement_sensors(site: dict) -> list[dict]:
+    return [x for x in (site.get("SurfaceSensors") or []) if isinstance(x, dict)]
+
+
+def pavement_temp(site: dict):
+    """First usable pavement temperature (F), or None if the site has no pavement sensor / no reading."""
+    for x in pavement_sensors(site):
+        t = x.get("SurfaceTemperature")
+        if isinstance(t, (int, float)) and -50 <= t <= 180:
+            return t
+    return None
+
+
 def guess_station_type(site: dict) -> str:
     text = f"{site.get('Location', '')} {site.get('Description', '')}".lower()
     return "bridge" if "bridge" in text or "overpass" in text else "road"
@@ -162,14 +175,22 @@ def report(all_sites: list[dict], near: list[dict], radius: float, attempts: lis
           "then the cross street. For example `D05 OH101FS LIC IR70 112.16- IR70 @ SR256` is District 5, county LIC "
           "(Licking), Interstate 70 at milepost 112.16, at State Route 256.",
           "",
-          "| Id | Location | Description | Miles from downtown | Lat | Lon | Air temp F now |",
-          "|---|---|---|---|---|---|---|"]
+          "| Id | Location | Miles from downtown | Pavement sensors | Pavement temp F now | Air temp F now |",
+          "|---|---|---|---|---|---|"]
     for s in near:
-        md.append(f"| `{s['Id']}` | {s.get('Location') or ''} | {s.get('Description') or ''} | {s['miles']:.1f} | "
-                  f"{float(s['Latitude']):.4f} | {float(s['Longitude']):.4f} | {s.get('AverageAirTemperature') or ''} |")
+        pt = pavement_temp(s)
+        md.append(f"| `{s['Id']}` | {s.get('Location') or ''} | {s['miles']:.1f} | "
+                  f"{len(pavement_sensors(s)) or '**none**'} | {'' if pt is None else pt} | {s.get('AverageAirTemperature') or ''} |")
+    usable = [s for s in near if pavement_sensors(s)]
+    skipped = [s for s in near if not pavement_sensors(s)]
+    md += ["", f"**{len(usable)} of these {len(near)} sites have a pavement sensor.** METRo needs road surface "
+               "temperature readings, so sites marked **none** report only air conditions and cannot be used "
+               "(they are left out of the sites.yaml snippet below)."]
     md += ["", "## Starting point for sites.yaml", "",
            "Copy the sites you want. Edit the names, check each station type, and replace the pavement layers "
-           "with real ones.", "", "```yaml", yaml_snippet(near), "```", ""]
+           "with real ones.", "", "```yaml", yaml_snippet(usable), "```", ""]
+    if skipped:
+        md += ["Left out (no pavement sensor): " + ", ".join(f"`{x['Id']}`" for x in skipped), ""]
 
     fields = sensor_fields(all_sites)
     md += ["## What OHGO reports for each sensor", "",
@@ -178,8 +199,9 @@ def report(all_sites: list[dict], near: list[dict], radius: float, attempts: lis
         md.append(f"- **{kind}**: {', '.join(f'`{n}`' for n in names) or '(none)'}")
 
     if near:
-        sample = {k: v for k, v in near[0].items() if k != "miles"}
-        md += ["", f"## One complete record (site `{near[0]['Id']}`)", "", "```json",
+        pick = next((x for x in near if pavement_sensors(x)), near[0])
+        sample = {k: v for k, v in pick.items() if k != "miles"}
+        md += ["", f"## One complete record (site `{pick['Id']}`" + ("" if pavement_sensors(pick) else ", no pavement sensor") + ")", "", "```json",
                json.dumps(sample, indent=2), "```", ""]
     if attempts:
         md += [""] + attempts_report(attempts)
