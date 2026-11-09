@@ -61,7 +61,7 @@ Prefer small, focused PRs. Don't open a PR unless asked. Don't make sweeping cha
 - `docs/verification.md`: how forecasts and flags are checked against RWIS observations (`scripts/verify.py`).
 - `app/`: Streamlit app: `streamlit_app.py` (entry point + navigation), pages `forecast.py` and `verification.py`, plus `charts.py`, `road_data.py`, `ui.py`, `requirements.txt`. It only **reads** from the `data` branch via raw GitHub URLs.
 - `tests/`: pytest tests (`python -m pytest tests -q`). Run by `.github/workflows/tests.yml` on every PR.
-- `.github/workflows/`: `fetch-obs.yml` (hourly), `forecast.yml` (4x/day), `verify.yml` (daily), `tests.yml`.
+- `.github/workflows/`: `fetch-obs.yml` (hourly), `forecast.yml` (4x/day), `verify.yml` (daily), `tests.yml`, and `list-ohgo-sites.yml` (manual helper that lists OHGO site IDs near Columbus via `scripts/list_ohgo_sites.py`).
 - `data` branch: pipeline output only; no source code. `data/obs/`, `data/forcing/`, `data/roadcast/`, `data/flags/<cycle>.json`, `data/latest.json` (pointer to the newest cycle that the app reads), and `data/verification/summary.json` (daily).
 
 ## Site configuration

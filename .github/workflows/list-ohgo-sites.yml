@@ -1,0 +1,31 @@
+name: List OHGO sites (helper)
+
+# One-off helper: lists the OHGO weather sensor sites near Columbus so you can
+# copy their IDs into sites.yaml. Run it by hand (Actions tab > this workflow >
+# Run workflow). Results appear on the run's summary page. Needs the
+# OHGO_API_KEY secret. It changes nothing in the repo.
+on:
+  workflow_dispatch:
+    inputs:
+      radius_miles:
+        description: "How far from downtown Columbus to search (miles)"
+        default: "40"
+
+permissions:
+  contents: read
+
+jobs:
+  list-sites:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests==2.32.3
+      - name: List sites
+        env:
+          OHGO_API_KEY: ${{ secrets.OHGO_API_KEY }}
+          RADIUS: ${{ inputs.radius_miles }}
+        run: python scripts/list_ohgo_sites.py --radius-miles "$RADIUS"
