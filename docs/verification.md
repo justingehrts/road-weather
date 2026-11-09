@@ -46,6 +46,6 @@ A number shows as "–" when its bottom line is zero (for example, no hazard was
 
 ### Surface condition words
 
-The station's surface condition is plain text, and OHGO's public documentation does not list the allowed values. `classify_condition()` in `scripts/verify.py` maps words to categories: `frost`, `ice` (also "black ice"), `snow` (also "slush"), `wet` (also "damp", "moist", "chemically wet") and `dry`. "Watch" states such as "Ice Watch" mean ice is possible, not present, so they do not count as ice or snow. If OHGO uses other words, edit that function.
+The station's surface condition is plain text. OHGO reports it in the pavement sensor's `Status` field (its documentation only calls it the "status of the sensor" and lists no values). Seen so far: `Dry`; `Unknown` marks an empty sensor slot and is treated as no information. `classify_condition()` in `scripts/verify.py` maps words to categories: `frost`, `ice` (also "black ice"), `snow` (also "slush"), `wet` (also "damp", "moist", "chemically wet") and `dry`. "Watch" states such as "Ice Watch" mean ice is possible, not present, so they do not count as ice or snow. If OHGO uses other words, edit that function.
 
 Observations with **no** surface condition are skipped, not counted as "no hazard". If the station never reports one, the page says so and only temperature (and "Bridges first") is scored.

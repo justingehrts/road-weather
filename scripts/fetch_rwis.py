@@ -52,7 +52,16 @@ RANGES = {
 }
 # Keys that might hold the road surface condition (dry/wet/snow/ice...).
 # The OHGO docs do not list one, so we look for a few likely names.
-CONDITION_KEYS = ("SurfaceCondition", "RoadCondition", "SurfaceStatus")
+# OHGO reports the road surface condition (e.g. "Dry") in the pavement sensor's `Status` field.
+# Empty sensor slots say "Unknown". The other names are kept in case OHGO adds a dedicated field.
+CONDITION_KEYS = ("SurfaceCondition", "RoadCondition", "SurfaceStatus", "Status")
+# Placeholder values that mean "no information", not "no hazard".
+NO_CONDITION = {"", "unknown", "error", "other", "n/a", "na", "none", "not reported", "no report"}
+
+
+def meaningful_condition(value) -> str:
+    text = str(value).strip() if value is not None else ""
+    return "" if text.lower() in NO_CONDITION else text
 
 
 def log(msg: str) -> None:
@@ -144,14 +153,16 @@ def build_row(site: dict) -> dict | None:
     sub, _ = first_valid(surf, "SubSurfaceTemperature", "subsurface_temp_f")
 
     wind_dir = next((str(s["WindDirection"]) for s in atmos if s.get("WindDirection")), "")
+    # The condition comes from a pavement sensor that is actually reporting (empty slots say "Unknown").
     cond, status = "", ""
-    for s in surf:
-        for k in CONDITION_KEYS:
-            if s.get(k):
-                cond = str(s[k])
-                break
-        if s.get("Status") and not status:
+    working = [x for x in surf if valid("road_temp_f", to_float(x.get("SurfaceTemperature"))) is not None]
+    for s in working or surf:
+        if not status and s.get("Status"):
             status = str(s["Status"])
+        for k in CONDITION_KEYS:
+            cond = meaningful_condition(s.get(k))
+            if cond:
+                break
         if cond:
             break
 

@@ -59,6 +59,10 @@ def log(msg: str) -> None:
     print(msg, file=sys.stderr, flush=True)
 
 
+# Placeholder values some stations send when they have nothing to report.
+NO_INFORMATION = {"unknown", "error", "other", "n/a", "na", "none", "not reported", "no report"}
+
+
 # ------------------------------------------------- RWIS condition vocabulary
 def classify_condition(text: str | None) -> set[str] | None:
     """Map an RWIS surface-condition string to {frost, ice, snow, wet, dry}.
@@ -69,7 +73,7 @@ def classify_condition(text: str | None) -> set[str] | None:
     not count as ice or snow. Adjust the words here if OHGO uses others.
     """
     t = (text or "").strip().lower()
-    if not t:
+    if not t or t in NO_INFORMATION:
         return None
     cats: set[str] = set()
     watch = "watch" in t

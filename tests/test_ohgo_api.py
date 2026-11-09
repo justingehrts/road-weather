@@ -75,3 +75,41 @@ def test_site_lister_reads_a_real_shaped_answer(monkeypatch):
     assert [s["Id"] for s in near] == ["200110"]            # I-70 at SR256 is about 17 miles from downtown
     text = lo.report(sites, near, 40, attempts)
     assert "`200110`" in text and "D05 OH101FS LIC IR70" in text and "ODOT code" in text
+
+
+# ---- road surface condition: OHGO reports it in the pavement sensor's `Status` field ----
+def site_with_pavement(statuses_and_temps):
+    return normalize_keys({
+        "id": "38010", "latitude": 39.8888, "longitude": -82.8826,
+        "atmosphericSensors": [{"airTemperature": 53.1, "dewpointTemperature": 42.6, "lastUpdate": "2026-11-09T10:10:03"}],
+        "surfaceSensors": [{"name": "", "status": st, "surfaceTemperature": t, "subSurfaceTemperature": -9999999,
+                            "lastUpdate": "2026-11-09T10:10:03"} for st, t in statuses_and_temps]})
+
+
+def test_status_of_a_working_pavement_sensor_becomes_the_surface_condition():
+    row = fetch_rwis.build_row(site_with_pavement([("Dry", 57.2)]))
+    assert row["surface_condition"] == "Dry" and row["road_temp_f"] == "57.2"
+
+
+def test_unknown_status_from_empty_slots_is_not_a_condition():
+    """38007 on GitHub: nine sensor slots, all -9999999 with status Unknown. That is 'no information'."""
+    row = fetch_rwis.build_row(site_with_pavement([("Unknown", -9999999)] * 3))
+    assert row["surface_condition"] == "" and row["road_temp_f"] == ""
+
+
+def test_the_condition_comes_from_the_sensor_that_is_actually_reporting():
+    row = fetch_rwis.build_row(site_with_pavement([("Unknown", -9999999), ("Wet", 41.0), ("Dry", 42.0)]))
+    assert row["surface_condition"] == "Wet"
+
+
+@pytest.mark.parametrize("word", ["Unknown", "unknown", "Error", "Other", "N/A", "None", ""])
+def test_placeholder_words_mean_no_information_in_both_scripts(word):
+    import verify
+    assert fetch_rwis.meaningful_condition(word) == ""
+    assert verify.classify_condition(word) is None            # skipped, never counted as "no hazard"
+
+
+def test_real_conditions_still_pass_through():
+    import verify
+    assert fetch_rwis.meaningful_condition("Dry") == "Dry"
+    assert verify.classify_condition("Dry") == {"dry"}
