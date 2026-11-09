@@ -213,6 +213,34 @@ def append_row(csv_path: Path, row: dict) -> bool:
     return True
 
 
+def collect(api_key: str, wanted: dict[str, str], out_dir: Path, verbose: bool = True) -> int:
+    """Fetch OHGO once and append each wanted site's newest reading to its CSV. Returns the rows added."""
+    results = fetch_all(api_key)
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    seen, added = set(), 0
+    for site in results:
+        ohgo_id = str(site.get("Id"))
+        if ohgo_id not in wanted:
+            continue
+        seen.add(ohgo_id)
+        name = wanted[ohgo_id]
+        row = build_row(site)
+        if row is None:
+            log(f"{name}: no usable observation")
+            continue
+        if append_row(out_dir / f"{name}.csv", row):
+            added += 1
+            if verbose:
+                log(f"{name}: added {row['obs_time_utc']}")
+        elif verbose:
+            log(f"{name}: {row['obs_time_utc']} already recorded")
+
+    for ohgo_id in sorted(set(wanted) - seen):
+        log(f"warning: {wanted[ohgo_id]} (ohgo_site_id {ohgo_id}) not found in OHGO response")
+    return added
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--sites", type=Path, default=Path("sites.yaml"))
@@ -229,28 +257,7 @@ def main() -> int:
         log("no sites with a real ohgo_site_id in sites.yaml; nothing to do")
         return 0
 
-    results = fetch_all(api_key)
-    args.out_dir.mkdir(parents=True, exist_ok=True)
-
-    seen, added = set(), 0
-    for site in results:
-        ohgo_id = str(site.get("Id"))
-        if ohgo_id not in wanted:
-            continue
-        seen.add(ohgo_id)
-        name = wanted[ohgo_id]
-        row = build_row(site)
-        if row is None:
-            log(f"{name}: no usable observation")
-            continue
-        if append_row(args.out_dir / f"{name}.csv", row):
-            added += 1
-            log(f"{name}: added {row['obs_time_utc']}")
-        else:
-            log(f"{name}: {row['obs_time_utc']} already recorded")
-
-    for ohgo_id in sorted(set(wanted) - seen):
-        log(f"warning: {wanted[ohgo_id]} (ohgo_site_id {ohgo_id}) not found in OHGO response")
+    added = collect(api_key, wanted, args.out_dir)
     log(f"done: {added} new row(s)")
     return 0
 

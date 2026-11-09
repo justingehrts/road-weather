@@ -1,0 +1,97 @@
+name: Poll OHGO observations (continuous)
+
+# METRo needs a steady trickle of road-station readings, but GitHub starts scheduled
+# workflows hours late (or skips them), so an hourly schedule does not work reliably.
+# This job instead stays running for about 5.5 hours, asks OHGO for new readings every
+# 15 minutes and saves them to the `data` branch once an hour. When it finishes it starts
+# the next run, so polling is continuous. Public repositories get free runner minutes,
+# and the job is asleep almost all of the time.
+#
+# Restart safety net: the cron below starts a run every 3 hours if the chain ever breaks
+# (the `concurrency` rule keeps only one run going; extra triggers wait their turn).
+#
+# TO STOP IT: disable this workflow in the Actions tab (and cancel the run in progress).
+# A run that fails quickly (for example a bad API key) does NOT start another one.
+#
+# The scheduled trigger only works for the repository's DEFAULT branch.
+on:
+  workflow_dispatch:
+    inputs:
+      duration_minutes:
+        description: "How long to poll (minutes). 325 is the normal full run."
+        default: "325"
+      continue_chain:
+        description: "Start another run when this one finishes? Untick for a short test."
+        type: boolean
+        default: true
+  schedule:
+    - cron: "17 */3 * * *"
+
+permissions:
+  contents: write   # push observations to the `data` branch
+  actions: write    # start the next run
+
+concurrency:
+  group: obs-poll
+  cancel-in-progress: false
+
+jobs:
+  poll:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350   # the hard limit is 360
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Check out data branch (create it if missing)
+        run: |
+          if git ls-remote --exit-code --heads origin data >/dev/null 2>&1; then
+            git fetch origin data
+            git worktree add databranch origin/data
+            git -C databranch checkout -B data origin/data
+          else
+            git worktree add --orphan -b data databranch
+          fi
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests==2.32.3 pyyaml==6.0.2
+
+      - name: Poll OHGO
+        env:
+          OHGO_API_KEY: ${{ secrets.OHGO_API_KEY }}
+          DURATION: ${{ inputs.duration_minutes || '325' }}
+        run: python scripts/poll_obs.py --repo databranch --duration-minutes "$DURATION"
+
+      # Safety net: runs even if the job was cancelled or timed out, so collected rows are not lost.
+      - name: Save anything not yet committed
+        if: ${{ always() }}
+        working-directory: databranch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [ -e data/obs ]; then git add data/obs; fi
+          if [ -e .gitattributes ]; then git add .gitattributes; fi
+          if git diff --cached --quiet; then
+            echo "Nothing left to save."
+          else
+            git commit -m "Add RWIS observations (poller, cleanup) $(date -u +%Y-%m-%dT%H:%MZ)"
+          fi
+          for attempt in 1 2 3 4 5; do
+            git push origin data && exit 0
+            echo "push rejected (attempt $attempt); pulling and retrying"
+            git pull --rebase origin data || git rebase --abort
+            sleep $((attempt * 3))
+          done
+          exit 1
+
+      # Only after a full, healthy run; a quick failure never restarts itself.
+      - name: Start the next run
+        if: ${{ success() && (github.event_name != 'workflow_dispatch' || inputs.continue_chain) }}
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run poll-obs.yml --ref "$GITHUB_REF_NAME"

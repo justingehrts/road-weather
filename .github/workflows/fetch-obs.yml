@@ -1,15 +1,13 @@
-name: Fetch RWIS observations (hourly)
+name: Fetch RWIS observations (once, manual)
 
-# METRo needs several hours of road-station readings, but OHGO only gives the
-# latest one. So we collect one reading per site every hour and keep them on
-# the `data` branch. The forecast workflow reads them from there.
+# One-off "fetch the latest readings right now" tool (Actions tab > Run workflow).
 #
-# NOTE: GitHub only runs `schedule:` triggers for the workflow file on the
-# repository's DEFAULT branch.
+# The hourly schedule that used to be here was REPLACED by poll-obs.yml, because GitHub
+# starts scheduled workflows hours late or skips them. poll-obs.yml now collects the
+# observations continuously. This workflow is kept only for manual use; it is safe to run
+# while the poller is running (both merge their new rows into the same CSV files).
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "20 * * * *"   # minute 20, to avoid GitHub's busy top-of-hour queue
 
 permissions:
   contents: write   # needed to push CSVs to the `data` branch
