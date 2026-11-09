@@ -144,8 +144,14 @@ def compact_sample(site: dict) -> dict:
 
 
 def guess_station_type(site: dict) -> str:
+    """OHGO does not say whether a sensor is on a bridge deck. Only the word "bridge" in the name is a hint.
+
+    "Overpass" is deliberately NOT treated as a bridge: it usually means a cross street or railroad passes
+    over the site's road, so the sensor is on ordinary pavement beneath it (checked against the national
+    bridge inventory for site 200015 on 2026-11-09).
+    """
     text = f"{site.get('Location', '')} {site.get('Description', '')}".lower()
-    return "bridge" if "bridge" in text or "overpass" in text else "road"
+    return "bridge" if "bridge" in text else "road"
 
 
 def sensor_fields(sites: list[dict]) -> dict[str, list[str]]:
@@ -168,7 +174,7 @@ def yaml_snippet(sites: list[dict]) -> str:
             f"    lat: {float(s['Latitude']):.5f}",
             f"    lon: {float(s['Longitude']):.5f}",
             f'    ohgo_site_id: "{s["Id"]}"',
-            f"    station_type: {guess_station_type(s)}   # CHECK: road or bridge?",
+            f"    station_type: {guess_station_type(s)}   # CHECK: OHGO does not say; a bridge-deck sensor is rare",
             "    pavement_layers:   # TODO: real layers, top to bottom",
             "      - { material: asphalt,  thickness_m: 0.10 }",
             "      - { material: crushed rock, thickness_m: 0.30 }",

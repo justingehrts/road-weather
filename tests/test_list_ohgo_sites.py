@@ -32,9 +32,11 @@ def test_nearby_filters_sorts_and_skips_records_without_coordinates():
     assert len(lo.nearby(SITES, lo.COLUMBUS, 200)) == 3
 
 
-def test_station_type_guess_looks_for_bridge_words():
+def test_station_type_guess_looks_for_the_word_bridge_only():
     assert lo.guess_station_type(SITES[1]) == "bridge"
     assert lo.guess_station_type(SITES[0]) == "road"
+    # "overpass" means something passes over the road, not that the sensor is on a bridge (site 200015)
+    assert lo.guess_station_type({"Location": "D06 OH016F PIC SR752 01.32- SR752 @ RR Overpass"}) == "road"
 
 
 def test_sensor_fields_shows_a_surface_condition_if_one_exists():
