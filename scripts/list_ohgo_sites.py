@@ -105,13 +105,42 @@ def pavement_sensors(site: dict) -> list[dict]:
     return [x for x in (site.get("SurfaceSensors") or []) if isinstance(x, dict)]
 
 
+def valid_reading(value, lo=-50, hi=180) -> bool:
+    """OHGO fills empty sensor slots with -9999999 (and other garbage); a real temperature is plausible."""
+    return isinstance(value, (int, float)) and lo <= value <= hi
+
+
+def working_pavement_sensors(site: dict) -> list[dict]:
+    """Surface sensors that are reporting a real pavement temperature right now."""
+    return [x for x in pavement_sensors(site) if valid_reading(x.get("SurfaceTemperature"))]
+
+
 def pavement_temp(site: dict):
-    """First usable pavement temperature (F), or None if the site has no pavement sensor / no reading."""
-    for x in pavement_sensors(site):
-        t = x.get("SurfaceTemperature")
-        if isinstance(t, (int, float)) and -50 <= t <= 180:
-            return t
+    """First real pavement temperature (F), or None if no pavement sensor is reporting."""
+    for x in working_pavement_sensors(site):
+        return x["SurfaceTemperature"]
     return None
+
+
+def subsurface_temp(site: dict):
+    for x in pavement_sensors(site):
+        if valid_reading(x.get("SubSurfaceTemperature")):
+            return x["SubSurfaceTemperature"]
+    return None
+
+
+def compact_sample(site: dict) -> dict:
+    """A copy of a site record for display, with repeated empty sensor slots collapsed."""
+    out = {k: v for k, v in site.items() if k != "miles"}
+    sensors = pavement_sensors(site)
+    shown = [x for x in sensors if valid_reading(x.get("SurfaceTemperature")) or valid_reading(x.get("SubSurfaceTemperature"))][:2]
+    empty = [x for x in sensors if x not in shown]
+    if empty:
+        shown = shown + empty[:1]
+        out["SurfaceSensors"] = shown
+        out["SurfaceSensorsNote"] = (f"{len(sensors)} surface sensor slots in total; {len(empty)} report no data "
+                                     f"(-9999999); only {len(shown)} are shown here")
+    return out
 
 
 def guess_station_type(site: dict) -> str:
@@ -175,22 +204,28 @@ def report(all_sites: list[dict], near: list[dict], radius: float, attempts: lis
           "then the cross street. For example `D05 OH101FS LIC IR70 112.16- IR70 @ SR256` is District 5, county LIC "
           "(Licking), Interstate 70 at milepost 112.16, at State Route 256.",
           "",
-          "| Id | Location | Miles from downtown | Pavement sensors | Pavement temp F now | Air temp F now |",
-          "|---|---|---|---|---|---|"]
+          "| Id | Location | Miles from downtown | Pavement sensors working now | Pavement temp F | Subsurface temp F | Air temp F |",
+          "|---|---|---|---|---|---|---|"]
     for s in near:
-        pt = pavement_temp(s)
-        md.append(f"| `{s['Id']}` | {s.get('Location') or ''} | {s['miles']:.1f} | "
-                  f"{len(pavement_sensors(s)) or '**none**'} | {'' if pt is None else pt} | {s.get('AverageAirTemperature') or ''} |")
-    usable = [s for s in near if pavement_sensors(s)]
-    skipped = [s for s in near if not pavement_sensors(s)]
-    md += ["", f"**{len(usable)} of these {len(near)} sites have a pavement sensor.** METRo needs road surface "
-               "temperature readings, so sites marked **none** report only air conditions and cannot be used "
-               "(they are left out of the sites.yaml snippet below)."]
+        pt, st = pavement_temp(s), subsurface_temp(s)
+        total, working = len(pavement_sensors(s)), len(working_pavement_sensors(s))
+        label = f"{working} of {total}" if total else "**no sensors**"
+        if total and not working:
+            label = f"**0** of {total}"
+        md.append(f"| `{s['Id']}` | {s.get('Location') or ''} | {s['miles']:.1f} | {label} | "
+                  f"{'' if pt is None else pt} | {'' if st is None else st} | {s.get('AverageAirTemperature') or ''} |")
+    usable = [s for s in near if working_pavement_sensors(s)]
+    skipped = [s for s in near if not working_pavement_sensors(s)]
+    md += ["", f"**{len(usable)} of these {len(near)} sites have a pavement sensor reporting a real temperature right now.** "
+               "METRo needs road surface temperature, so sites with none cannot be used. OHGO lists empty sensor "
+               "slots with the value -9999999, so a site can show several sensors and still report nothing. "
+               "Those sites are left out of the sites.yaml snippet below. A sensor can be down for a while, "
+               "so run this again another day before ruling a site out."]
     md += ["", "## Starting point for sites.yaml", "",
            "Copy the sites you want. Edit the names, check each station type, and replace the pavement layers "
            "with real ones.", "", "```yaml", yaml_snippet(usable), "```", ""]
     if skipped:
-        md += ["Left out (no pavement sensor): " + ", ".join(f"`{x['Id']}`" for x in skipped), ""]
+        md += ["Left out (no pavement reading right now): " + ", ".join(f"`{x['Id']}`" for x in skipped), ""]
 
     fields = sensor_fields(all_sites)
     md += ["## What OHGO reports for each sensor", "",
@@ -199,9 +234,9 @@ def report(all_sites: list[dict], near: list[dict], radius: float, attempts: lis
         md.append(f"- **{kind}**: {', '.join(f'`{n}`' for n in names) or '(none)'}")
 
     if near:
-        pick = next((x for x in near if pavement_sensors(x)), near[0])
-        sample = {k: v for k, v in pick.items() if k != "miles"}
-        md += ["", f"## One complete record (site `{pick['Id']}`" + ("" if pavement_sensors(pick) else ", no pavement sensor") + ")", "", "```json",
+        pick = next((x for x in near if working_pavement_sensors(x)), near[0])
+        sample = compact_sample(pick)
+        md += ["", f"## One site's record (site `{pick['Id']}`" + ("" if working_pavement_sensors(pick) else ", no working pavement sensor") + ")", "", "```json",
                json.dumps(sample, indent=2), "```", ""]
     if attempts:
         md += [""] + attempts_report(attempts)

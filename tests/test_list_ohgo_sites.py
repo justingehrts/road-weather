@@ -58,7 +58,7 @@ def test_report_has_table_snippet_fields_and_a_full_record():
     text = lo.report(SITES, near, 40)
     assert "`55-1`" in text and "I-70 West of Columbus" in text
     assert "ohgo_site_id" in text and "SurfaceCondition" in text
-    assert "One complete record" in text and '"Id"' in text
+    assert "One site's record" in text and '"Id"' in text
 
 
 def test_missing_key_is_reported_not_crashed(monkeypatch, capsys):
@@ -130,8 +130,8 @@ def test_sites_without_a_pavement_sensor_are_marked_and_left_out_of_the_snippet(
     near = lo.nearby(SITES, lo.COLUMBUS, 40)            # 88-3 has no sensors; 55-1 has a pavement sensor
     assert lo.pavement_temp(SITES[0]) == 44.1 and lo.pavement_temp(SITES[1]) is None
     text = lo.report(SITES, near, 40)
-    assert "1 of these 2 sites have a pavement sensor" in text
-    assert "**none**" in text and "Left out (no pavement sensor): `88-3`" in text
+    assert "1 of these 2 sites have a pavement sensor reporting a real temperature" in text
+    assert "**no sensors**" in text and "Left out (no pavement reading right now): `88-3`" in text
     snippet = text.split("```yaml")[1].split("```")[0]
     assert "55-1" in snippet and "88-3" not in snippet
 
@@ -140,3 +140,31 @@ def test_pavement_temp_ignores_garbage_readings():
     assert lo.pavement_temp({"SurfaceSensors": [{"SurfaceTemperature": -148.0}, {"SurfaceTemperature": 40.5}]}) == 40.5
     assert lo.pavement_temp({"SurfaceSensors": [{"SurfaceTemperature": 9999}]}) is None
     assert lo.pavement_temp({"SurfaceSensors": []}) is None
+
+
+# OHGO fills unused sensor slots with -9999999: a site can list nine sensors and report nothing.
+EMPTY_SLOTS = {"Id": "38007", "Latitude": 39.8919, "Longitude": -83.04, "Location": "IR71 S @ IR270",
+               "SurfaceSensors": [{"Name": "", "Status": "Unknown", "SurfaceTemperature": -9999999,
+                                   "SubSurfaceTemperature": 32.0, "LastUpdate": "2026-11-09T10:05:02"}]
+               + [{"Name": "", "Status": "Unknown", "SurfaceTemperature": -9999999, "SubSurfaceTemperature": -9999999}] * 8}
+
+
+def test_empty_sensor_slots_do_not_count_as_working_sensors():
+    assert len(lo.pavement_sensors(EMPTY_SLOTS)) == 9
+    assert lo.working_pavement_sensors(EMPTY_SLOTS) == [] and lo.pavement_temp(EMPTY_SLOTS) is None
+    near = lo.nearby([EMPTY_SLOTS], lo.COLUMBUS, 40)
+    text = lo.report([EMPTY_SLOTS], near, 40)
+    assert "0 of these 1 sites have a pavement sensor reporting a real temperature" in text and "**0** of 9" in text
+    assert "Left out (no pavement reading right now): `38007`" in text
+    assert "-9999999" in text                                  # the explanation mentions OHGO's empty marker
+
+
+def test_the_sample_record_collapses_repeated_empty_slots():
+    sample = lo.compact_sample(EMPTY_SLOTS)
+    assert len(sample["SurfaceSensors"]) <= 3 and "9 surface sensor slots" in sample["SurfaceSensorsNote"]
+    assert "miles" not in sample
+
+
+def test_subsurface_temp_ignores_the_empty_marker():
+    assert lo.subsurface_temp(EMPTY_SLOTS) == 32.0
+    assert lo.subsurface_temp({"SurfaceSensors": [{"SubSurfaceTemperature": -9999999}]}) is None
