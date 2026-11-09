@@ -5,11 +5,11 @@ name: Fetch RWIS observations (hourly)
 # the `data` branch. The forecast workflow reads them from there.
 #
 # NOTE: GitHub only runs `schedule:` triggers for the workflow file on the
-# default branch, so the schedule takes effect once this is merged to it.
+# repository's DEFAULT branch.
 on:
   workflow_dispatch:
-   schedule:
-     - cron: "20 * * * *"   # minute 20, to avoid GitHub's busy top-of-hour queue
+  schedule:
+    - cron: "20 * * * *"   # minute 20, to avoid GitHub's busy top-of-hour queue
 
 permissions:
   contents: write   # needed to push CSVs to the `data` branch
