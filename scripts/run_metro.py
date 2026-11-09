@@ -385,6 +385,10 @@ def main() -> int:
     log(f"HRRR cycle {tag}")
 
     sites = yaml.safe_load(args.sites.read_text())["sites"]
+    # METRo is launched from inside each site's work folder, so every path handed to it must be absolute.
+    # (Relative paths resolved against that folder and METRo could not even open its log file.)
+    work_root = args.work_dir.resolve()
+    args.metro_dir = args.metro_dir.resolve()
     written, errors, skipped = 0, 0, 0
     now = datetime.now(timezone.utc)
     for site in sites:
@@ -392,7 +396,7 @@ def main() -> int:
         forcing = args.forcing_dir / f"hrrr_{tag}_{sid}.csv"
         obs_csv = args.obs_dir / f"{sid}.csv"
         out_csv = args.out_dir / f"{tag}_{sid}.csv"
-        work = args.work_dir / sid
+        work = work_root / sid
         work.mkdir(parents=True, exist_ok=True)
         try:
             if not forcing.exists():
