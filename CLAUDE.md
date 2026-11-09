@@ -55,7 +55,7 @@ Prefer small, focused PRs. Don't open a PR unless asked. Don't make sweeping cha
 
 ## Repo layout
 
-- `sites.yaml`: the list of RWIS sites, pavement layers, bridge pairings and traffic level (placeholders until real values are filled in).
+- `sites.yaml`: the 13 RWIS sites (real OHGO ids; generic pavement layers until real ones are known), bridge pairings and traffic level.
 - `scripts/`: pipeline code. `fetch_rwis.py`, `fetch_hrrr.py`, `build_metro.sh`, `run_metro.py`, `flags.py`, `verify.py`.
 - `docs/flags.md`: the hazard-flag rules (source of truth for `scripts/flags.py`; edit thresholds in `THRESHOLDS` at the top of that script).
 - `docs/verification.md`: how forecasts and flags are checked against RWIS observations (`scripts/verify.py`).
@@ -77,7 +77,7 @@ Prefer small, focused PRs. Don't open a PR unless asked. Don't make sweeping cha
 | `station_type` | `road` or `bridge` (bridges lose heat from below and freeze sooner, so METRo needs to know) |
 | `pavement_layers` | Ordered list, top to bottom, each with `material` and `thickness_m` |
 
-Current entries are **placeholders**; real IDs, coordinates and layer data must be confirmed before trusting any forecast.
+The 13 current entries use **real** OHGO ids, coordinates and counties (checked 2026-11-09; 200053 was deliberately left out). The **pavement layers, road/bridge types and traffic levels are generic guesses** (METRo's example road; all `road`; Interstates `heavy`); real values must be confirmed before trusting any forecast. 200060 (I-71 at CR 9) is flagged in the file because it is 30-40 m from a bridge on its own road.
 
 ## Conventions
 

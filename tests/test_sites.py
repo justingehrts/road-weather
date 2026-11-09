@@ -35,3 +35,16 @@ def test_paired_road_sites_exist_and_are_roads():
         if pair:
             assert s["station_type"] == "bridge", f"{s['id']}: only bridges can have a paired_road_site"
             assert pair in by_id and by_id[pair]["station_type"] == "road"
+
+
+def test_every_site_has_a_real_unique_ohgo_id():
+    ids = [str(s["ohgo_site_id"]) for s in SITES]
+    assert len(ids) == len(set(ids)), "duplicate ohgo_site_id"
+    for i in ids:
+        assert i.isdigit(), f"ohgo_site_id {i!r} is not a real OHGO id (a number kept as text)"
+    assert "200053" not in ids                      # deliberately left out
+
+
+def test_sites_are_near_columbus():
+    for s in SITES:
+        assert 39.3 <= s["lat"] <= 40.7 and -84.0 <= s["lon"] <= -82.0, f"{s['id']} is outside the Columbus window"
