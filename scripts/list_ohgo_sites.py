@@ -38,14 +38,51 @@ def miles_between(lat1, lon1, lat2, lon2) -> float:
     return 3958.8 * 2 * math.asin(math.sqrt(a))
 
 
-def fetch_sites(api_key: str) -> list[dict]:
-    resp = requests.get(API_URL, headers={"Authorization": f"APIKEY {api_key}"},
-                        params={"page-all": "true"}, timeout=60)
+# Ways of asking OHGO for the sites. They are tried in order until one returns something,
+# and every attempt is reported, so an empty answer can be diagnosed.
+ATTEMPTS = [
+    ("all pages", {"page-all": "true"}),
+    ("default paging", {}),
+    ("region columbus", {"region": "columbus"}),
+    ("region central-ohio", {"region": "central-ohio"}),
+]
+
+
+def fetch_once(api_key: str, params: dict) -> dict:
+    """One request. Returns what came back, without hiding anything that looks odd."""
+    resp = requests.get(API_URL, headers={"Authorization": f"APIKEY {api_key}"}, params=params, timeout=60)
     if resp.status_code in (401, 403):
         raise SystemExit("OHGO rejected the API key (HTTP %d). Check that the OHGO_API_KEY secret holds the "
                          "key exactly, with no extra spaces." % resp.status_code)
-    resp.raise_for_status()
-    return resp.json().get("Results", [])
+    out = {"status": resp.status_code, "results": [], "keys": [], "meta": {}, "preview": resp.text[:600]}
+    if resp.status_code != 200:
+        return out
+    try:
+        body = resp.json()
+    except ValueError:
+        return out
+    if isinstance(body, dict):
+        out["keys"] = sorted(body.keys())
+        out["results"] = body.get("Results") or []
+        out["meta"] = {k: body[k] for k in ("TotalResultCount", "CurrentResultCount", "TotalPageCount",
+                                             "AccecptedFilters", "AcceptedFilters", "RejectedFilters") if k in body}
+    elif isinstance(body, list):
+        out["keys"] = ["(a bare list)"]
+        out["results"] = body
+    return out
+
+
+def fetch_sites(api_key: str) -> tuple[list[dict], list[dict]]:
+    """Return (sites, attempts). `attempts` describes every request made, for the report."""
+    attempts, sites = [], []
+    for label, params in ATTEMPTS:
+        r = fetch_once(api_key, params)
+        attempts.append({"label": label, "params": params, **{k: r[k] for k in ("status", "keys", "meta", "preview")},
+                         "count": len(r["results"])})
+        if r["results"]:
+            sites = r["results"]
+            break
+    return sites, attempts
 
 
 def nearby(sites: list[dict], center: tuple[float, float], radius_miles: float) -> list[dict]:
@@ -95,7 +132,20 @@ def yaml_snippet(sites: list[dict]) -> str:
     return "\n".join(lines)
 
 
-def report(all_sites: list[dict], near: list[dict], radius: float) -> str:
+def attempts_report(attempts: list[dict]) -> list[str]:
+    """How OHGO answered each request. Raw detail is shown only for requests that returned nothing."""
+    md = ["## What OHGO answered", "", "| Request | HTTP status | Sites returned | Fields in the answer |", "|---|---|---|---|"]
+    for a in attempts:
+        md.append(f"| {a['label']} | {a['status']} | {a['count']} | {', '.join(f'`{k}`' for k in a['keys']) or '(none)'} |")
+    for a in attempts:
+        if not a["count"]:
+            md += ["", f"**{a['label']}** returned no sites. OHGO's own counts and filter notes:", "", "```json",
+                   json.dumps(a["meta"], indent=2) if a["meta"] else "(none)", "```",
+                   "", "Start of the raw answer:", "", "```", a["preview"], "```"]
+    return md + [""]
+
+
+def report(all_sites: list[dict], near: list[dict], radius: float, attempts: list[dict] | None = None) -> str:
     md = [f"# OHGO weather sensor sites near Columbus",
           "",
           f"OHGO lists **{len(all_sites)}** sites statewide; **{len(near)}** are within **{radius:g} miles** of downtown Columbus.",
@@ -123,6 +173,8 @@ def report(all_sites: list[dict], near: list[dict], radius: float) -> str:
         sample = {k: v for k, v in near[0].items() if k != "miles"}
         md += ["", f"## One complete record (site `{near[0]['Id']}`)", "", "```json",
                json.dumps(sample, indent=2), "```", ""]
+    if attempts:
+        md += [""] + attempts_report(attempts)
     return "\n".join(md)
 
 
@@ -138,15 +190,17 @@ def main() -> int:
         log("OHGO_API_KEY is not set. Add it under Settings > Secrets and variables > Actions.")
         return 1
 
-    sites = fetch_sites(key)
+    sites, attempts = fetch_sites(key)
     near = nearby(sites, (args.lat, args.lon), args.radius_miles)
-    text = report(sites, near, args.radius_miles)
+    text = report(sites, near, args.radius_miles, attempts)
     print(text)
     summary = os.environ.get("GITHUB_STEP_SUMMARY")
     if summary:
         with open(summary, "a") as f:
             f.write(text + "\n")
-    if not near:
+    if not sites:
+        log("OHGO answered but returned no sites at all; see the 'What OHGO answered' section.")
+    elif not near:
         log(f"No sites within {args.radius_miles:g} miles; try a bigger radius.")
     return 0
 

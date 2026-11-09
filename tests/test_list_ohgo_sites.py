@@ -73,7 +73,7 @@ def test_main_never_prints_the_key(monkeypatch, capsys, tmp_path):
     monkeypatch.setenv("OHGO_API_KEY", secret)
     summary = tmp_path / "summary.md"
     monkeypatch.setenv("GITHUB_STEP_SUMMARY", str(summary))
-    monkeypatch.setattr(lo, "fetch_sites", lambda key: SITES)
+    monkeypatch.setattr(lo, "fetch_sites", lambda key: (SITES, [{"label": "all pages", "params": {}, "status": 200, "keys": ["Results"], "meta": {}, "preview": "", "count": len(SITES)}]))
     monkeypatch.setattr(sys, "argv", ["list_ohgo_sites.py", "--radius-miles", "40"])
     assert lo.main() == 0
     out = capsys.readouterr()
@@ -82,8 +82,45 @@ def test_main_never_prints_the_key(monkeypatch, capsys, tmp_path):
 
 
 def test_a_rejected_key_gives_a_plain_message(monkeypatch):
-    class Resp:
-        status_code = 401
-    monkeypatch.setattr(lo.requests, "get", lambda *a, **k: Resp())
+    monkeypatch.setattr(lo.requests, "get", lambda *a, **k: FakeResp(401))
     with pytest.raises(SystemExit, match="rejected the API key"):
         lo.fetch_sites("bad")
+
+
+class FakeResp:
+    def __init__(self, status=200, body=None, text=""):
+        self.status_code, self._body, self.text = status, body, text or str(body)
+
+    def json(self):
+        if self._body is None:
+            raise ValueError("not json")
+        return self._body
+
+
+def test_an_empty_answer_is_explained_not_hidden(monkeypatch):
+    """What happened on GitHub: HTTP 200 but no sites. The report must say what OHGO actually sent."""
+    answer = {"Links": [], "TotalResultCount": 0, "RejectedFilters": [{"Name": "page-all", "Message": "not valid"}], "Results": []}
+    monkeypatch.setattr(lo.requests, "get", lambda *a, **k: FakeResp(200, answer))
+    sites, attempts = lo.fetch_sites("k")
+    assert sites == [] and len(attempts) == len(lo.ATTEMPTS)          # every way of asking was tried
+    text = lo.report(sites, [], 40, attempts)
+    assert "What OHGO answered" in text and "RejectedFilters" in text and "page-all" in text
+    assert "TotalResultCount" in text
+
+
+def test_a_later_way_of_asking_is_used_if_the_first_returns_nothing(monkeypatch):
+    calls = []
+
+    def fake_get(url, headers=None, params=None, timeout=None):
+        calls.append(dict(params))
+        return FakeResp(200, {"Results": SITES} if params == {} else {"Results": []})
+    monkeypatch.setattr(lo.requests, "get", fake_get)
+    sites, attempts = lo.fetch_sites("k")
+    assert len(sites) == len(SITES) and [a["count"] for a in attempts] == [0, len(SITES)]
+    assert calls == [{"page-all": "true"}, {}]
+
+
+def test_non_json_answers_do_not_crash(monkeypatch):
+    monkeypatch.setattr(lo.requests, "get", lambda *a, **k: FakeResp(200, None, text="<html>oops</html>"))
+    sites, attempts = lo.fetch_sites("k")
+    assert sites == [] and "oops" in attempts[0]["preview"]
