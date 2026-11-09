@@ -22,6 +22,8 @@ from zoneinfo import ZoneInfo
 import requests
 import yaml
 
+from ohgo_api import normalize_keys
+
 API_URL = "https://publicapi.ohgo.com/api/v1/weather-sensor-sites"
 # Only used if OHGO sends a timestamp with no timezone. ASSUMPTION: Ohio local time.
 NAIVE_TZ = ZoneInfo("America/New_York")
@@ -108,7 +110,14 @@ def fetch_all(api_key: str) -> list[dict]:
         timeout=60,
     )
     resp.raise_for_status()
-    return resp.json().get("Results", [])
+    body = normalize_keys(resp.json())      # the live API uses camelCase; the code uses PascalCase
+    results = body.get("Results") or []
+    if not results:
+        # Fail loudly: an empty answer would otherwise look like "no new observations".
+        raise RuntimeError(
+            "OHGO returned no weather sensor sites (answer fields: %s; total reported: %s)"
+            % (", ".join(sorted(body)) or "none", body.get("TotalResultCount")))
+    return results
 
 
 def first_valid(sensors: list[dict], key: str, name: str):

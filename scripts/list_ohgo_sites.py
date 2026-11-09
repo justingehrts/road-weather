@@ -22,6 +22,8 @@ import sys
 
 import requests
 
+from ohgo_api import normalize_keys
+
 API_URL = "https://publicapi.ohgo.com/api/v1/weather-sensor-sites"
 COLUMBUS = (39.9612, -83.0007)   # downtown Columbus, Ohio
 
@@ -62,13 +64,14 @@ def fetch_once(api_key: str, params: dict) -> dict:
     except ValueError:
         return out
     if isinstance(body, dict):
-        out["keys"] = sorted(body.keys())
+        out["keys"] = sorted(body.keys())             # as OHGO spelled them (shows camelCase vs PascalCase)
+        body = normalize_keys(body)                   # the rest of the code uses PascalCase
         out["results"] = body.get("Results") or []
         out["meta"] = {k: body[k] for k in ("TotalResultCount", "CurrentResultCount", "TotalPageCount",
                                              "AccecptedFilters", "AcceptedFilters", "RejectedFilters") if k in body}
     elif isinstance(body, list):
         out["keys"] = ["(a bare list)"]
-        out["results"] = body
+        out["results"] = normalize_keys(body)
     return out
 
 
@@ -152,7 +155,12 @@ def report(all_sites: list[dict], near: list[dict], radius: float, attempts: lis
           "",
           "## Sites (nearest first)",
           "",
-          "The **Id** column is the value that goes in `ohgo_site_id` in `sites.yaml`.",
+          "The **Id** column is the value that goes in `ohgo_site_id` in `sites.yaml` (it is also the last part of the "
+          "site's address in OHGO's API, e.g. `.../weather-sensor-sites/200110`).",
+          "",
+          "OHGO's **Location** text is an ODOT code, roughly: district, station code, county, route and milepost, "
+          "then the cross street. For example `D05 OH101FS LIC IR70 112.16- IR70 @ SR256` is District 5, county LIC "
+          "(Licking), Interstate 70 at milepost 112.16, at State Route 256.",
           "",
           "| Id | Location | Description | Miles from downtown | Lat | Lon | Air temp F now |",
           "|---|---|---|---|---|---|---|"]
