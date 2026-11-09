@@ -1,2 +1,3 @@
 obs_time_utc,air_temp_f,dewpoint_f,wind_avg_mph,wind_max_mph,wind_dir,road_temp_f,subsurface_temp_f,surface_condition,surface_sensor_status
 2026-11-09T15:30:03Z,52,38.8,0.6,5.6,North,57.2,56.3,Dry,Dry
+2026-11-09T17:45:03Z,54.3,37.9,3.7,6.2,Northwest,71.6,57.2,Dry,Dry
