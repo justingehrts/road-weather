@@ -107,7 +107,7 @@ compact = is_phone()
 fig = charts.meteogram(road, obs, now, theme, compact)
 st.plotly_chart(fig, theme=None, width="stretch",
                 alt="Line chart of forecast road surface temperature, air temperature and dewpoint in "
-                    "degrees Fahrenheit, with observed road temperature as dots and a 32 degree reference line.")
+                    "degrees Fahrenheit, with observed road, air and dewpoint temperatures as dots and a 32 degree reference line.")
 
 intervals = rd.flag_intervals(site)
 x_range = fig.layout.xaxis.range

@@ -127,3 +127,16 @@ def test_flag_intervals_converts_to_eastern(tmp_path):
                                        "end": "2026-11-05T16:00:00Z", "hours": 1.33, "score": None, "detail": ""}]})
     assert iv["start_et"].iloc[0] == pd.Timestamp("2026-11-05 10:00:00")    # EST = UTC-5
     assert rd.flag_intervals({"flags": []}).empty
+
+
+def test_meteogram_plots_observed_air_and_dewpoint_dots():
+    import pandas as pd
+    import charts
+    t = pd.date_range("2026-01-01", periods=4, freq="20min", tz="UTC")
+    road = pd.DataFrame({"time_utc": t, "road_temp_f": 20.0, "air_temp_f": 18.0, "dewpoint_f": 10.0})
+    obs = pd.DataFrame({"time_utc": t[:2], "road_temp_f": [21.0, 22.0], "air_temp_f": [19.0, None],
+                        "dewpoint_f": [None, None]})
+    fig = charts.meteogram(road, obs, pd.Timestamp("2026-01-01"), "light", False)
+    dots = {tr.name: list(tr.y) for tr in fig.data if tr.mode == "markers"}
+    assert set(dots) == {"Road surface temp (observed)", "Air temp (observed)"}   # all-empty dewpoint is skipped
+    assert dots["Air temp (observed)"][0] == 19.0
