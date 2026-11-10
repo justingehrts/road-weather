@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-11-09T21:37:30Z",
+  "generated_utc": "2026-11-10T18:48:01Z",
   "window_days": 30,
   "lead_bins": [
     "0-6",
@@ -11,49 +11,1971 @@
     "36-42",
     "42-48"
   ],
-  "cycles_verified": 0,
-  "matched_pairs": 0,
+  "cycles_verified": 3,
+  "matched_pairs": 2295,
   "temperature": {
     "road_temp_f": {
       "label": "Road surface temperature",
-      "overall_by_lead": [],
-      "by_site": {}
+      "overall_by_lead": [
+        {
+          "lead": "0-6",
+          "n": 219,
+          "bias": -2.25,
+          "rmse": 2.64,
+          "mae": 2.31
+        },
+        {
+          "lead": "6-12",
+          "n": 675,
+          "bias": -0.05,
+          "rmse": 4.8,
+          "mae": 3.93
+        },
+        {
+          "lead": "12-18",
+          "n": 569,
+          "bias": -4.16,
+          "rmse": 5.03,
+          "mae": 4.43
+        },
+        {
+          "lead": "18-24",
+          "n": 559,
+          "bias": -0.89,
+          "rmse": 6.1,
+          "mae": 5.38
+        },
+        {
+          "lead": "24-30",
+          "n": 273,
+          "bias": 2.32,
+          "rmse": 5.25,
+          "mae": 4.63
+        }
+      ],
+      "by_site": {
+        "rwis_200011": {
+          "name": "SR 188 at US 33, Fairfield Co.",
+          "station_type": "road",
+          "overall": {
+            "n": 193,
+            "bias": -0.1,
+            "rmse": 3.97,
+            "mae": 3.13
+          },
+          "by_lead": [
+            {
+              "lead": "0-6",
+              "n": 18,
+              "bias": -2.2,
+              "rmse": 2.64,
+              "mae": 2.32
+            },
+            {
+              "lead": "6-12",
+              "n": 57,
+              "bias": 0.97,
+              "rmse": 3.77,
+              "mae": 2.57
+            },
+            {
+              "lead": "12-18",
+              "n": 48,
+              "bias": -2.18,
+              "rmse": 2.35,
+              "mae": 2.18
+            },
+            {
+              "lead": "18-24",
+              "n": 47,
+              "bias": 0.13,
+              "rmse": 5.16,
+              "mae": 4.48
+            },
+            {
+              "lead": "24-30",
+              "n": 23,
+              "bias": 2.8,
+              "rmse": 5.05,
+              "mae": 4.36
+            }
+          ]
+        },
+        "rwis_200012": {
+          "name": "SR 13, milepost 3.66, Knox Co.",
+          "station_type": "road",
+          "overall": {
+            "n": 193,
+            "bias": 2.13,
+            "rmse": 3.75,
+            "mae": 2.37
+          },
+          "by_lead": [
+            {
+              "lead": "0-6",
+              "n": 18,
+              "bias": -0.7,
+              "rmse": 0.91,
+              "mae": 0.8
+            },
+            {
+              "lead": "6-12",
+              "n": 57,
+              "bias": 1.78,
+              "rmse": 3.52,
+              "mae": 2.05
+            },
+            {
+              "lead": "12-18",
+              "n": 48,
+              "bias": 0.84,
+              "rmse": 0.99,
+              "mae": 0.92
+            },
+            {
+              "lead": "18-24",
+              "n": 47,
+              "bias": 3.34,
+              "rmse": 4.85,
+              "mae": 3.34
+            },
+            {
+              "lead": "24-30",
+              "n": 23,
+              "bias": 5.43,
+              "rmse": 6.06,
+              "mae": 5.43
+            }
+          ]
+        },
+        "rwis_200013": {
+          "name": "SR 13 at Sheridan Rd, Perry Co.",
+          "station_type": "road",
+          "overall": {
+            "n": 193,
+            "bias": 1.41,
+            "rmse": 3.05,
+            "mae": 2.09
+          },
+          "by_lead": [
+            {
+              "lead": "0-6",
+              "n": 18,
+              "bias": -0.9,
+              "rmse": 1.71,
+              "mae": 1.32
+            },
+            {
+              "lead": "6-12",
+              "n": 57,
+              "bias": 1.57,
+              "rmse": 3.11,
+              "mae": 2.3
+            },
+            {
+              "lead": "12-18",
+              "n": 48,
+              "bias": 0.61,
+              "rmse": 1.02,
+              "mae": 0.86
+            },
+            {
+              "lead": "18-24",
+              "n": 47,
+              "bias": 2.02,
+              "rmse": 4.01,
+              "mae": 2.69
+            },
+            {
+              "lead": "24-30",
+              "n": 23,
+              "bias": 3.21,
+              "rmse": 4.08,
+              "mae": 3.52
+            }
+          ]
+        },
+        "rwis_200014": {
+          "name": "US 35 at SR 62, Fayette Co.",
+          "station_type": "road",
+          "overall": {
+            "n": 187,
+            "bias": -0.72,
+            "rmse": 5.18,
+            "mae": 4.55
+          },
+          "by_lead": [
+            {
+              "lead": "0-6",
+              "n": 17,
+              "bias": -1.42,
+              "rmse": 1.58,
+              "mae": 1.44
+            },
+            {
+              "lead": "6-12",
+              "n": 56,
+              "bias": 0.18,
+              "rmse": 5.32,
+              "mae": 4.56
+            },
+            {
+              "lead": "12-18",
+              "n": 47,
+              "bias": -4.67,
+              "rmse": 4.87,
+              "mae": 4.67
+            },
+            {
+              "lead": "18-24",
+              "n": 45,
+              "bias": 0.14,
+              "rmse": 5.95,
+              "mae": 5.4
+            },
+            {
+              "lead": "24-30",
+              "n": 22,
+              "bias": 4.21,
+              "rmse": 5.55,
+              "mae": 4.94
+            }
+          ]
+        },
+        "rwis_200015": {
+          "name": "SR 752 at railroad overpass, Pickaway Co.",
+          "station_type": "road",
+          "overall": {
+            "n": 193,
+            "bias": 0.33,
+            "rmse": 4.72,
+            "mae": 3.81
+          },
+          "by_lead": [
+            {
+              "lead": "0-6",
+              "n": 18,
+              "bias": -1.98,
+              "rmse": 2.28,
+              "mae": 1.98
+            },
+            {
+              "lead": "6-12",
+              "n": 57,
+              "bias": 1.17,
+              "rmse": 4.61,
+              "mae": 3.43
+            },
+            {
+              "lead": "12-18",
+              "n": 48,
+              "bias": -2.56,
+              "rmse": 2.63,
+              "mae": 2.56
+            },
+            {
+              "lead": "18-24",
+              "n": 47,
+              "bias": 0.98,
+              "rmse": 6.01,
+              "mae": 5.25
+            },
+            {
+              "lead": "24-30",
+              "n": 23,
+              "bias": 4.73,
+              "rmse": 6.49,
+              "mae": 5.87
+            }
+          ]
+        },
+        "rwis_200017": {
+          "name": "US 33 at SR 739, Union Co.",
+          "station_type": "road",
+          "overall": {
+            "n": 193,
+            "bias": -1.86,
+            "rmse": 4.68,
+            "mae": 4.3
+          },
+          "by_lead": [
+            {
+              "lead": "0-6",
+              "n": 18,
+              "bias": -2.48,
+              "rmse": 2.59,
+              "mae": 2.48
+            },
+            {
+              "lead": "6-12",
+              "n": 57,
+              "bias": -0.58,
+              "rmse": 4.41,
+              "mae": 3.88
+            },
+            {
+              "lead": "12-18",
+              "n": 48,
+              "bias": -4.88,
+              "rmse": 4.94,
+              "mae": 4.88
+            },
+            {
+              "lead": "18-24",
+              "n": 47,
+              "bias": -1.65,
+              "rmse": 5.42,
+              "mae": 5.08
+            },
+            {
+              "lead": "24-30",
+              "n": 23,
+              "bias": 1.31,
+              "rmse": 4.43,
+              "mae": 3.93
+            }
+          ]
+        },
+        "rwis_200060": {
+          "name": "I-71 at CR 9, Madison Co.",
+          "station_type": "road",
+          "overall": {
+            "n": 193,
+            "bias": -2.23,
+            "rmse": 5.31,
+            "mae": 4.93
+          },
+          "by_lead": [
+            {
+              "lead": "0-6",
+              "n": 18,
+              "bias": -2.92,
+              "rmse": 2.98,
+              "mae": 2.92
+            },
+            {
+              "lead": "6-12",
+              "n": 57,
+              "bias": -0.74,
+              "rmse": 4.98,
+              "mae": 4.48
+            },
+            {
+              "lead": "12-18",
+              "n": 48,
+              "bias": -5.95,
+              "rmse": 6.03,
+              "mae": 5.95
+            },
+            {
+              "lead": "18-24",
+              "n": 47,
+              "bias": -2.02,
+              "rmse": 6.01,
+              "mae": 5.67
+            },
+            {
+              "lead": "24-30",
+              "n": 23,
+              "bias": 1.92,
+              "rmse": 4.31,
+              "mae": 3.98
+            }
+          ]
+        },
+        "rwis_200061": {
+          "name": "I-270 at Cemetery Rd, Franklin Co.",
+          "station_type": "road",
+          "overall": {
+            "n": 193,
+            "bias": -3.58,
+            "rmse": 6.31,
+            "mae": 5.81
+          },
+          "by_lead": [
+            {
+              "lead": "0-6",
+              "n": 18,
+              "bias": -3.24,
+              "rmse": 3.57,
+              "mae": 3.24
+            },
+            {
+              "lead": "6-12",
+              "n": 57,
+              "bias": -1.51,
+              "rmse": 5.28,
+              "mae": 4.82
+            },
+            {
+              "lead": "12-18",
+              "n": 48,
+              "bias": -7.19,
+              "rmse": 7.24,
+              "mae": 7.19
+            },
+            {
+              "lead": "18-24",
+              "n": 47,
+              "bias": -4.05,
+              "rmse": 7.5,
+              "mae": 7.06
+            },
+            {
+              "lead": "24-30",
+              "n": 23,
+              "bias": -0.51,
+              "rmse": 5.52,
+              "mae": 4.84
+            }
+          ]
+        },
+        "rwis_200181": {
+          "name": "I-71 at SR 665, Franklin Co.",
+          "station_type": "road",
+          "overall": {
+            "n": 193,
+            "bias": -2.35,
+            "rmse": 5.59,
+            "mae": 5.2
+          },
+          "by_lead": [
+            {
+              "lead": "0-6",
+              "n": 18,
+              "bias": -2.58,
+              "rmse": 2.65,
+              "mae": 2.58
+            },
+            {
+              "lead": "6-12",
+              "n": 57,
+              "bias": -1.21,
+              "rmse": 5.39,
+              "mae": 4.98
+            },
+            {
+              "lead": "12-18",
+              "n": 48,
+              "bias": -6.07,
+              "rmse": 6.14,
+              "mae": 6.07
+            },
+            {
+              "lead": "18-24",
+              "n": 47,
+              "bias": -1.97,
+              "rmse": 6.31,
+              "mae": 5.93
+            },
+            {
+              "lead": "24-30",
+              "n": 23,
+              "bias": 2.02,
+              "rmse": 5.02,
+              "mae": 4.52
+            }
+          ]
+        },
+        "rwis_38000": {
+          "name": "I-71 at US 36, Delaware Co.",
+          "station_type": "road",
+          "overall": {
+            "n": 193,
+            "bias": -1.42,
+            "rmse": 5.65,
+            "mae": 4.93
+          },
+          "by_lead": [
+            {
+              "lead": "0-6",
+              "n": 18,
+              "bias": -2.51,
+              "rmse": 2.74,
+              "mae": 2.51
+            },
+            {
+              "lead": "6-12",
+              "n": 57,
+              "bias": 0.12,
+              "rmse": 5.58,
+              "mae": 4.41
+            },
+            {
+              "lead": "12-18",
+              "n": 48,
+              "bias": -4.83,
+              "rmse": 4.88,
+              "mae": 4.83
+            },
+            {
+              "lead": "18-24",
+              "n": 47,
+              "bias": -1.29,
+              "rmse": 6.96,
+              "mae": 6.39
+            },
+            {
+              "lead": "24-30",
+              "n": 23,
+              "bias": 2.46,
+              "rmse": 5.97,
+              "mae": 5.37
+            }
+          ]
+        },
+        "rwis_38005": {
+          "name": "I-70 at SR 29, Madison Co.",
+          "station_type": "road",
+          "overall": {
+            "n": 12,
+            "bias": -2.6,
+            "rmse": 3.74,
+            "mae": 3.55
+          },
+          "by_lead": [
+            {
+              "lead": "0-6",
+              "n": 7,
+              "bias": -3.46,
+              "rmse": 3.67,
+              "mae": 3.46
+            },
+            {
+              "lead": "6-12",
+              "n": 5,
+              "bias": -1.39,
+              "rmse": 3.83,
+              "mae": 3.68
+            }
+          ]
+        },
+        "rwis_38010": {
+          "name": "US 33 at Hamilton Rd, Franklin Co.",
+          "station_type": "road",
+          "overall": {
+            "n": 193,
+            "bias": -3.19,
+            "rmse": 6.32,
+            "mae": 5.81
+          },
+          "by_lead": [
+            {
+              "lead": "0-6",
+              "n": 18,
+              "bias": -2.62,
+              "rmse": 3.1,
+              "mae": 2.62
+            },
+            {
+              "lead": "6-12",
+              "n": 57,
+              "bias": -1.45,
+              "rmse": 5.72,
+              "mae": 5.09
+            },
+            {
+              "lead": "12-18",
+              "n": 48,
+              "bias": -6.72,
+              "rmse": 6.84,
+              "mae": 6.72
+            },
+            {
+              "lead": "18-24",
+              "n": 47,
+              "bias": -3.35,
+              "rmse": 7.47,
+              "mae": 7.14
+            },
+            {
+              "lead": "24-30",
+              "n": 23,
+              "bias": -0.27,
+              "rmse": 5.94,
+              "mae": 5.43
+            }
+          ]
+        },
+        "rwis_38015": {
+          "name": "SR 4 at SR 203, Marion Co.",
+          "station_type": "road",
+          "overall": {
+            "n": 166,
+            "bias": -3.02,
+            "rmse": 5.74,
+            "mae": 5.3
+          },
+          "by_lead": [
+            {
+              "lead": "0-6",
+              "n": 15,
+              "bias": -3.1,
+              "rmse": 3.28,
+              "mae": 3.1
+            },
+            {
+              "lead": "6-12",
+              "n": 44,
+              "bias": -1.07,
+              "rmse": 5.19,
+              "mae": 4.86
+            },
+            {
+              "lead": "12-18",
+              "n": 42,
+              "bias": -6.67,
+              "rmse": 6.77,
+              "mae": 6.67
+            },
+            {
+              "lead": "18-24",
+              "n": 44,
+              "bias": -3.11,
+              "rmse": 6.62,
+              "mae": 6.19
+            },
+            {
+              "lead": "24-30",
+              "n": 21,
+              "bias": 0.44,
+              "rmse": 3.63,
+              "mae": 3.22
+            }
+          ]
+        }
+      }
     },
     "air_temp_f": {
       "label": "Air temperature",
-      "overall_by_lead": [],
-      "by_site": {}
+      "overall_by_lead": [
+        {
+          "lead": "0-6",
+          "n": 235,
+          "bias": -0.52,
+          "rmse": 1.94,
+          "mae": 1.6
+        },
+        {
+          "lead": "6-12",
+          "n": 707,
+          "bias": -1.07,
+          "rmse": 3.19,
+          "mae": 2.74
+        },
+        {
+          "lead": "12-18",
+          "n": 576,
+          "bias": -0.47,
+          "rmse": 3.42,
+          "mae": 2.97
+        },
+        {
+          "lead": "18-24",
+          "n": 564,
+          "bias": -2.44,
+          "rmse": 3.87,
+          "mae": 3.46
+        },
+        {
+          "lead": "24-30",
+          "n": 276,
+          "bias": -3.92,
+          "rmse": 4.49,
+          "mae": 4.16
+        }
+      ],
+      "by_site": {
+        "rwis_200011": {
+          "name": "SR 188 at US 33, Fairfield Co.",
+          "station_type": "road",
+          "overall": {
+            "n": 193,
+            "bias": -0.84,
+            "rmse": 3.41,
+            "mae": 3.08
+          },
+          "by_lead": [
+            {
+              "lead": "0-6",
+              "n": 18,
+              "bias": -0.41,
+              "rmse": 2.0,
+              "mae": 1.55
+            },
+            {
+              "lead": "6-12",
+              "n": 57,
+              "bias": 0.8,
+              "rmse": 3.6,
+              "mae": 3.24
+            },
+            {
+              "lead": "12-18",
+              "n": 48,
+              "bias": 0.77,
+              "rmse": 3.18,
+              "mae": 2.95
+            },
+            {
+              "lead": "18-24",
+              "n": 47,
+              "bias": -2.98,
+              "rmse": 3.29,
+              "mae": 3.07
+            },
+            {
+              "lead": "24-30",
+              "n": 23,
+              "bias": -4.21,
+              "rmse": 4.34,
+              "mae": 4.21
+            }
+          ]
+        },
+        "rwis_200012": {
+          "name": "SR 13, milepost 3.66, Knox Co.",
+          "station_type": "road",
+          "overall": {
+            "n": 193,
+            "bias": 2.39,
+            "rmse": 4.76,
+            "mae": 4.46
+          },
+          "by_lead": [
+            {
+              "lead": "0-6",
+              "n": 18,
+              "bias": 2.41,
+              "rmse": 2.61,
+              "mae": 2.41
+            },
+            {
+              "lead": "6-12",
+              "n": 57,
+              "bias": 1.09,
+              "rmse": 4.07,
+              "mae": 3.75
+            },
+            {
+              "lead": "12-18",
+              "n": 48,
+              "bias": 5.76,
+              "rmse": 5.85,
+              "mae": 5.76
+            },
+            {
+              "lead": "18-24",
+              "n": 47,
+              "bias": 2.5,
+              "rmse": 5.19,
+              "mae": 4.97
+            },
+            {
+              "lead": "24-30",
+              "n": 23,
+              "bias": -1.65,
+              "rmse": 4.18,
+              "mae": 4.03
+            }
+          ]
+        },
+        "rwis_200013": {
+          "name": "SR 13 at Sheridan Rd, Perry Co.",
+          "station_type": "road",
+          "overall": {
+            "n": 193,
+            "bias": 1.29,
+            "rmse": 3.96,
+            "mae": 3.63
+          },
+          "by_lead": [
+            {
+              "lead": "0-6",
+              "n": 18,
+              "bias": 1.96,
+              "rmse": 2.2,
+              "mae": 1.96
+            },
+            {
+              "lead": "6-12",
+              "n": 57,
+              "bias": 0.72,
+              "rmse": 4.34,
+              "mae": 3.96
+            },
+            {
+              "lead": "12-18",
+              "n": 48,
+              "bias": 4.28,
+              "rmse": 4.37,
+              "mae": 4.28
+            },
+            {
+              "lead": "18-24",
+              "n": 47,
+              "bias": 0.76,
+              "rmse": 3.62,
+              "mae": 3.36
+            },
+            {
+              "lead": "24-30",
+              "n": 23,
+              "bias": -3.01,
+              "rmse": 3.85,
+              "mae": 3.34
+            }
+          ]
+        },
+        "rwis_200014": {
+          "name": "US 35 at SR 62, Fayette Co.",
+          "station_type": "road",
+          "overall": {
+            "n": 193,
+            "bias": -3.26,
+            "rmse": 3.64,
+            "mae": 3.27
+          },
+          "by_lead": [
+            {
+              "lead": "0-6",
+              "n": 18,
+              "bias": -1.32,
+              "rmse": 1.6,
+              "mae": 1.36
+            },
+            {
+              "lead": "6-12",
+              "n": 57,
+              "bias": -2.46,
+              "rmse": 2.91,
+              "mae": 2.48
+            },
+            {
+              "lead": "12-18",
+              "n": 48,
+              "bias": -3.05,
+              "rmse": 3.18,
+              "mae": 3.05
+            },
+            {
+              "lead": "18-24",
+              "n": 47,
+              "bias": -4.3,
+              "rmse": 4.4,
+              "mae": 4.3
+            },
+            {
+              "lead": "24-30",
+              "n": 23,
+              "bias": -5.07,
+              "rmse": 5.27,
+              "mae": 5.07
+            }
+          ]
+        },
+        "rwis_200015": {
+          "name": "SR 752 at railroad overpass, Pickaway Co.",
+          "station_type": "road",
+          "overall": {
+            "n": 193,
+            "bias": -1.76,
+            "rmse": 2.91,
+            "mae": 2.36
+          },
+          "by_lead": [
+            {
+              "lead": "0-6",
+              "n": 18,
+              "bias": -1.12,
+              "rmse": 2.06,
+              "mae": 1.86
+            },
+            {
+              "lead": "6-12",
+              "n": 57,
+              "bias": -1.08,
+              "rmse": 2.81,
+              "mae": 2.37
+            },
+            {
+              "lead": "12-18",
+              "n": 48,
+              "bias": -0.48,
+              "rmse": 1.36,
+              "mae": 1.1
+            },
+            {
+              "lead": "18-24",
+              "n": 47,
+              "bias": -2.96,
+              "rmse": 3.37,
+              "mae": 2.96
+            },
+            {
+              "lead": "24-30",
+              "n": 23,
+              "bias": -4.14,
+              "rmse": 4.62,
+              "mae": 4.14
+            }
+          ]
+        },
+        "rwis_200017": {
+          "name": "US 33 at SR 739, Union Co.",
+          "station_type": "road",
+          "overall": {
+            "n": 193,
+            "bias": -0.79,
+            "rmse": 2.52,
+            "mae": 2.26
+          },
+          "by_lead": [
+            {
+              "lead": "0-6",
+              "n": 18,
+              "bias": -1.24,
+              "rmse": 1.8,
+              "mae": 1.71
+            },
+            {
+              "lead": "6-12",
+              "n": 57,
+              "bias": 0.61,
+              "rmse": 2.51,
+              "mae": 2.15
+            },
+            {
+              "lead": "12-18",
+              "n": 48,
+              "bias": -0.02,
+              "rmse": 2.65,
+              "mae": 2.44
+            },
+            {
+              "lead": "18-24",
+              "n": 47,
+              "bias": -2.06,
+              "rmse": 2.34,
+              "mae": 2.11
+            },
+            {
+              "lead": "24-30",
+              "n": 23,
+              "bias": -2.91,
+              "rmse": 3.02,
+              "mae": 2.91
+            }
+          ]
+        },
+        "rwis_200060": {
+          "name": "I-71 at CR 9, Madison Co.",
+          "station_type": "road",
+          "overall": {
+            "n": 193,
+            "bias": -2.53,
+            "rmse": 3.3,
+            "mae": 2.67
+          },
+          "by_lead": [
+            {
+              "lead": "0-6",
+              "n": 18,
+              "bias": -0.12,
+              "rmse": 0.87,
+              "mae": 0.63
+            },
+            {
+              "lead": "6-12",
+              "n": 57,
+              "bias": -2.41,
+              "rmse": 3.03,
+              "mae": 2.59
+            },
+            {
+              "lead": "12-18",
+              "n": 48,
+              "bias": -1.89,
+              "rmse": 2.14,
+              "mae": 1.95
+            },
+            {
+              "lead": "18-24",
+              "n": 47,
+              "bias": -3.1,
+              "rmse": 3.82,
+              "mae": 3.17
+            },
+            {
+              "lead": "24-30",
+              "n": 23,
+              "bias": -4.92,
+              "rmse": 5.36,
+              "mae": 4.93
+            }
+          ]
+        },
+        "rwis_200061": {
+          "name": "I-270 at Cemetery Rd, Franklin Co.",
+          "station_type": "road",
+          "overall": {
+            "n": 193,
+            "bias": -3.51,
+            "rmse": 3.86,
+            "mae": 3.55
+          },
+          "by_lead": [
+            {
+              "lead": "0-6",
+              "n": 18,
+              "bias": -1.85,
+              "rmse": 2.44,
+              "mae": 1.98
+            },
+            {
+              "lead": "6-12",
+              "n": 57,
+              "bias": -2.32,
+              "rmse": 2.7,
+              "mae": 2.42
+            },
+            {
+              "lead": "12-18",
+              "n": 48,
+              "bias": -4.37,
+              "rmse": 4.48,
+              "mae": 4.37
+            },
+            {
+              "lead": "18-24",
+              "n": 47,
+              "bias": -4.48,
+              "rmse": 4.64,
+              "mae": 4.48
+            },
+            {
+              "lead": "24-30",
+              "n": 23,
+              "bias": -4.01,
+              "rmse": 4.07,
+              "mae": 4.01
+            }
+          ]
+        },
+        "rwis_200181": {
+          "name": "I-71 at SR 665, Franklin Co.",
+          "station_type": "road",
+          "overall": {
+            "n": 193,
+            "bias": -2.12,
+            "rmse": 2.74,
+            "mae": 2.36
+          },
+          "by_lead": [
+            {
+              "lead": "0-6",
+              "n": 18,
+              "bias": -0.45,
+              "rmse": 1.49,
+              "mae": 1.36
+            },
+            {
+              "lead": "6-12",
+              "n": 57,
+              "bias": -1.64,
+              "rmse": 2.4,
+              "mae": 2.03
+            },
+            {
+              "lead": "12-18",
+              "n": 48,
+              "bias": -1.78,
+              "rmse": 2.05,
+              "mae": 1.92
+            },
+            {
+              "lead": "18-24",
+              "n": 47,
+              "bias": -2.93,
+              "rmse": 3.2,
+              "mae": 2.93
+            },
+            {
+              "lead": "24-30",
+              "n": 23,
+              "bias": -3.71,
+              "rmse": 4.15,
+              "mae": 3.71
+            }
+          ]
+        },
+        "rwis_38000": {
+          "name": "I-71 at US 36, Delaware Co.",
+          "station_type": "road",
+          "overall": {
+            "n": 193,
+            "bias": -3.9,
+            "rmse": 4.25,
+            "mae": 3.9
+          },
+          "by_lead": [
+            {
+              "lead": "0-6",
+              "n": 18,
+              "bias": -1.62,
+              "rmse": 1.91,
+              "mae": 1.62
+            },
+            {
+              "lead": "6-12",
+              "n": 57,
+              "bias": -2.99,
+              "rmse": 3.47,
+              "mae": 3.01
+            },
+            {
+              "lead": "12-18",
+              "n": 48,
+              "bias": -4.46,
+              "rmse": 4.6,
+              "mae": 4.46
+            },
+            {
+              "lead": "18-24",
+              "n": 47,
+              "bias": -4.85,
+              "rmse": 4.99,
+              "mae": 4.85
+            },
+            {
+              "lead": "24-30",
+              "n": 23,
+              "bias": -4.79,
+              "rmse": 4.9,
+              "mae": 4.79
+            }
+          ]
+        },
+        "rwis_38005": {
+          "name": "I-70 at SR 29, Madison Co.",
+          "station_type": "road",
+          "overall": {
+            "n": 39,
+            "bias": -2.49,
+            "rmse": 2.61,
+            "mae": 2.49
+          },
+          "by_lead": [
+            {
+              "lead": "0-6",
+              "n": 16,
+              "bias": -1.77,
+              "rmse": 1.85,
+              "mae": 1.77
+            },
+            {
+              "lead": "6-12",
+              "n": 23,
+              "bias": -2.99,
+              "rmse": 3.03,
+              "mae": 2.99
+            }
+          ]
+        },
+        "rwis_38010": {
+          "name": "US 33 at Hamilton Rd, Franklin Co.",
+          "station_type": "road",
+          "overall": {
+            "n": 193,
+            "bias": -2.74,
+            "rmse": 3.39,
+            "mae": 2.78
+          },
+          "by_lead": [
+            {
+              "lead": "0-6",
+              "n": 18,
+              "bias": -1.71,
+              "rmse": 2.47,
+              "mae": 1.76
+            },
+            {
+              "lead": "6-12",
+              "n": 57,
+              "bias": -2.24,
+              "rmse": 3.1,
+              "mae": 2.37
+            },
+            {
+              "lead": "12-18",
+              "n": 48,
+              "bias": -1.81,
+              "rmse": 2.13,
+              "mae": 1.81
+            },
+            {
+              "lead": "18-24",
+              "n": 47,
+              "bias": -3.61,
+              "rmse": 3.95,
+              "mae": 3.61
+            },
+            {
+              "lead": "24-30",
+              "n": 23,
+              "bias": -4.95,
+              "rmse": 5.13,
+              "mae": 4.95
+            }
+          ]
+        },
+        "rwis_38015": {
+          "name": "SR 4 at SR 203, Marion Co.",
+          "station_type": "road",
+          "overall": {
+            "n": 196,
+            "bias": -0.41,
+            "rmse": 2.6,
+            "mae": 2.04
+          },
+          "by_lead": [
+            {
+              "lead": "0-6",
+              "n": 21,
+              "bias": 0.22,
+              "rmse": 1.16,
+              "mae": 0.95
+            },
+            {
+              "lead": "6-12",
+              "n": 57,
+              "bias": -0.14,
+              "rmse": 2.75,
+              "mae": 2.44
+            },
+            {
+              "lead": "12-18",
+              "n": 48,
+              "bias": 1.46,
+              "rmse": 1.8,
+              "mae": 1.49
+            },
+            {
+              "lead": "18-24",
+              "n": 47,
+              "bias": -1.31,
+              "rmse": 2.41,
+              "mae": 1.73
+            },
+            {
+              "lead": "24-30",
+              "n": 23,
+              "bias": -3.7,
+              "rmse": 4.37,
+              "mae": 3.84
+            }
+          ]
+        }
+      }
     }
   },
   "flags": {
     "condition_data": {
-      "observations": 39,
-      "with_surface_condition": 37
+      "observations": 1092,
+      "with_surface_condition": 1020
     },
     "by_flag": {
       "pavement_frost": {
         "name": "Pavement frost",
         "verified_against": "RWIS surface condition reports frost",
-        "overall": null,
-        "by_site": {}
+        "overall": {
+          "hits": 0,
+          "misses": 0,
+          "false_alarms": 0,
+          "correct_negatives": 2295,
+          "observed_events": 0,
+          "forecast_events": 0,
+          "total": 2295,
+          "hit_rate": null,
+          "false_alarm_ratio": null,
+          "false_alarm_rate": 0.0,
+          "low_sample": true
+        },
+        "by_site": {
+          "rwis_200011": {
+            "name": "SR 188 at US 33, Fairfield Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 193,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 193,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_200012": {
+            "name": "SR 13, milepost 3.66, Knox Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 193,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 193,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_200013": {
+            "name": "SR 13 at Sheridan Rd, Perry Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 193,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 193,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_200014": {
+            "name": "US 35 at SR 62, Fayette Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 187,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 187,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_200015": {
+            "name": "SR 752 at railroad overpass, Pickaway Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 193,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 193,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_200017": {
+            "name": "US 33 at SR 739, Union Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 193,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 193,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_200060": {
+            "name": "I-71 at CR 9, Madison Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 193,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 193,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_200061": {
+            "name": "I-270 at Cemetery Rd, Franklin Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 193,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 193,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_200181": {
+            "name": "I-71 at SR 665, Franklin Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 193,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 193,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_38000": {
+            "name": "I-71 at US 36, Delaware Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 193,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 193,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_38005": {
+            "name": "I-70 at SR 29, Madison Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 12,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 12,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_38010": {
+            "name": "US 33 at Hamilton Rd, Franklin Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 193,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 193,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_38015": {
+            "name": "SR 4 at SR 203, Marion Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 166,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 166,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          }
+        }
       },
       "black_ice": {
         "name": "Black ice / refreeze",
         "verified_against": "RWIS surface condition reports ice / black ice",
-        "overall": null,
-        "by_site": {}
+        "overall": {
+          "hits": 0,
+          "misses": 0,
+          "false_alarms": 0,
+          "correct_negatives": 2295,
+          "observed_events": 0,
+          "forecast_events": 0,
+          "total": 2295,
+          "hit_rate": null,
+          "false_alarm_ratio": null,
+          "false_alarm_rate": 0.0,
+          "low_sample": true
+        },
+        "by_site": {
+          "rwis_200011": {
+            "name": "SR 188 at US 33, Fairfield Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 193,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 193,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_200012": {
+            "name": "SR 13, milepost 3.66, Knox Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 193,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 193,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_200013": {
+            "name": "SR 13 at Sheridan Rd, Perry Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 193,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 193,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_200014": {
+            "name": "US 35 at SR 62, Fayette Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 187,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 187,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_200015": {
+            "name": "SR 752 at railroad overpass, Pickaway Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 193,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 193,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_200017": {
+            "name": "US 33 at SR 739, Union Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 193,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 193,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_200060": {
+            "name": "I-71 at CR 9, Madison Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 193,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 193,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_200061": {
+            "name": "I-270 at Cemetery Rd, Franklin Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 193,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 193,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_200181": {
+            "name": "I-71 at SR 665, Franklin Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 193,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 193,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_38000": {
+            "name": "I-71 at US 36, Delaware Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 193,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 193,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_38005": {
+            "name": "I-70 at SR 29, Madison Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 12,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 12,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_38010": {
+            "name": "US 33 at Hamilton Rd, Franklin Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 193,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 193,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_38015": {
+            "name": "SR 4 at SR 203, Marion Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 166,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 166,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          }
+        }
       },
       "flash_freeze": {
         "name": "Flash freeze",
         "verified_against": "RWIS condition changes from wet to ice within 3 h",
-        "overall": null,
-        "by_site": {}
+        "overall": {
+          "hits": 0,
+          "misses": 0,
+          "false_alarms": 0,
+          "correct_negatives": 2295,
+          "observed_events": 0,
+          "forecast_events": 0,
+          "total": 2295,
+          "hit_rate": null,
+          "false_alarm_ratio": null,
+          "false_alarm_rate": 0.0,
+          "low_sample": true
+        },
+        "by_site": {
+          "rwis_200011": {
+            "name": "SR 188 at US 33, Fairfield Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 193,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 193,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_200012": {
+            "name": "SR 13, milepost 3.66, Knox Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 193,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 193,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_200013": {
+            "name": "SR 13 at Sheridan Rd, Perry Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 193,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 193,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_200014": {
+            "name": "US 35 at SR 62, Fayette Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 187,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 187,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_200015": {
+            "name": "SR 752 at railroad overpass, Pickaway Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 193,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 193,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_200017": {
+            "name": "US 33 at SR 739, Union Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 193,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 193,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_200060": {
+            "name": "I-71 at CR 9, Madison Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 193,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 193,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_200061": {
+            "name": "I-270 at Cemetery Rd, Franklin Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 193,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 193,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_200181": {
+            "name": "I-71 at SR 665, Franklin Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 193,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 193,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_38000": {
+            "name": "I-71 at US 36, Delaware Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 193,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 193,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_38005": {
+            "name": "I-70 at SR 29, Madison Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 12,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 12,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_38010": {
+            "name": "US 33 at Hamilton Rd, Franklin Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 193,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 193,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_38015": {
+            "name": "SR 4 at SR 203, Marion Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 166,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 166,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          }
+        }
       },
       "wheel_track_glazing": {
         "name": "Wheel-track glazing",
         "verified_against": "RWIS surface condition reports ice or snow (crash/traffic-speed data not available)",
-        "overall": null,
-        "by_site": {}
+        "overall": {
+          "hits": 0,
+          "misses": 0,
+          "false_alarms": 0,
+          "correct_negatives": 784,
+          "observed_events": 0,
+          "forecast_events": 0,
+          "total": 784,
+          "hit_rate": null,
+          "false_alarm_ratio": null,
+          "false_alarm_rate": 0.0,
+          "low_sample": true
+        },
+        "by_site": {
+          "rwis_200060": {
+            "name": "I-71 at CR 9, Madison Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 193,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 193,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_200061": {
+            "name": "I-270 at Cemetery Rd, Franklin Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 193,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 193,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_200181": {
+            "name": "I-71 at SR 665, Franklin Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 193,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 193,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_38000": {
+            "name": "I-71 at US 36, Delaware Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 193,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 193,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_38005": {
+            "name": "I-70 at SR 29, Madison Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 12,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 12,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          }
+        }
       },
       "bridges_first": {
         "name": "Bridges first",
@@ -64,8 +1986,203 @@
       "freezing_rain": {
         "name": "Freezing rain",
         "verified_against": "RWIS surface condition reports ice (precipitation type is not observed)",
-        "overall": null,
-        "by_site": {}
+        "overall": {
+          "hits": 0,
+          "misses": 0,
+          "false_alarms": 0,
+          "correct_negatives": 2295,
+          "observed_events": 0,
+          "forecast_events": 0,
+          "total": 2295,
+          "hit_rate": null,
+          "false_alarm_ratio": null,
+          "false_alarm_rate": 0.0,
+          "low_sample": true
+        },
+        "by_site": {
+          "rwis_200011": {
+            "name": "SR 188 at US 33, Fairfield Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 193,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 193,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_200012": {
+            "name": "SR 13, milepost 3.66, Knox Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 193,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 193,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_200013": {
+            "name": "SR 13 at Sheridan Rd, Perry Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 193,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 193,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_200014": {
+            "name": "US 35 at SR 62, Fayette Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 187,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 187,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_200015": {
+            "name": "SR 752 at railroad overpass, Pickaway Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 193,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 193,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_200017": {
+            "name": "US 33 at SR 739, Union Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 193,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 193,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_200060": {
+            "name": "I-71 at CR 9, Madison Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 193,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 193,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_200061": {
+            "name": "I-270 at Cemetery Rd, Franklin Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 193,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 193,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_200181": {
+            "name": "I-71 at SR 665, Franklin Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 193,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 193,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_38000": {
+            "name": "I-71 at US 36, Delaware Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 193,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 193,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_38005": {
+            "name": "I-70 at SR 29, Madison Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 12,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 12,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_38010": {
+            "name": "US 33 at Hamilton Rd, Franklin Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 193,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 193,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          },
+          "rwis_38015": {
+            "name": "SR 4 at SR 203, Marion Co.",
+            "hits": 0,
+            "misses": 0,
+            "false_alarms": 0,
+            "correct_negatives": 166,
+            "observed_events": 0,
+            "forecast_events": 0,
+            "total": 166,
+            "hit_rate": null,
+            "false_alarm_ratio": null,
+            "false_alarm_rate": 0.0,
+            "low_sample": true
+          }
+        }
       }
     },
     "not_verified": {
