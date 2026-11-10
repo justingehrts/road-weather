@@ -58,15 +58,24 @@ def load_roadcast(cycle: str, site: str, base: str = DATA_BASE) -> pd.DataFrame 
     return df
 
 
+OBS_COLS = ["road_temp_f", "air_temp_f", "dewpoint_f"]
+
+
 def load_obs(site: str, since: pd.Timestamp, base: str = DATA_BASE) -> pd.DataFrame:
-    """Observed road surface temperature (degrees F) from `since` onward."""
+    """Observed road surface, air and dewpoint temperatures (degrees F) from `since` onward.
+
+    A row is kept if at least one of the three has a value; missing ones stay NaN.
+    """
     text = fetch_text(f"data/obs/{site}.csv", base)
     if text is None:
-        return pd.DataFrame(columns=["time_utc", "road_temp_f"])
+        return pd.DataFrame(columns=["time_utc", *OBS_COLS])
     df = pd.read_csv(io.StringIO(text))
+    for col in OBS_COLS:
+        if col not in df.columns:
+            df[col] = float("nan")
     df["time_utc"] = pd.to_datetime(df["obs_time_utc"], utc=True)
-    df = df[df["time_utc"] >= since].dropna(subset=["road_temp_f"])
-    return df[["time_utc", "road_temp_f"]].sort_values("time_utc").reset_index(drop=True)
+    df = df[df["time_utc"] >= since].dropna(subset=OBS_COLS, how="all")
+    return df[["time_utc", *OBS_COLS]].sort_values("time_utc").reset_index(drop=True)
 
 
 def to_eastern(series: pd.Series) -> pd.Series:

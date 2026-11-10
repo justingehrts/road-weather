@@ -66,7 +66,7 @@ def _spread(positions: list[float], min_gap: float) -> list[float]:
 
 
 def meteogram(road: pd.DataFrame, obs: pd.DataFrame, now, theme: str = "light", compact: bool = False) -> go.Figure:
-    """Forecast road surface temp, air temp, dewpoint (lines) + observed road temp (dots)."""
+    """Forecast road surface temp, air temp, dewpoint (lines) + observed road/air/dewpoint temps (dots)."""
     from road_data import to_eastern   # local import keeps this module light
 
     p = PALETTES[theme]
@@ -90,12 +90,19 @@ def meteogram(road: pd.DataFrame, obs: pd.DataFrame, now, theme: str = "light", 
                                showarrow=False, xanchor="left", xshift=6, font=dict(color=p["text2"], size=12))
     if len(obs):
         ot = to_eastern(obs["time_utc"])
-        fig.add_trace(go.Scatter(x=ot, y=obs["road_temp_f"], mode="markers", name="Road surface temp (observed)",
-                                 marker=dict(color=p["rst"], size=8, line=dict(color=p["surface"], width=2)),
-                                 hovertemplate="Observed road temp: %{y:.1f}°F<extra></extra>"))
-        if not compact:
-            fig.add_annotation(x=ot.iloc[0], y=obs["road_temp_f"].iloc[0], xref="x", yref="y",
-                               text="Observed road temp", showarrow=False, xanchor="left", yanchor="bottom",
+        observed = [("road_temp_f", "Road surface temp (observed)", "Observed road temp", p["rst"]),
+                    ("air_temp_f", "Air temp (observed)", "Observed air temp", p["air"]),
+                    ("dewpoint_f", "Dewpoint (observed)", "Observed dewpoint", p["dew"])]
+        for col, name, short, color in observed:
+            if col not in obs or obs[col].notna().sum() == 0:
+                continue
+            fig.add_trace(go.Scatter(x=ot, y=obs[col], mode="markers", name=name,
+                                     marker=dict(color=color, size=8, line=dict(color=p["surface"], width=2)),
+                                     hovertemplate=f"{short}: %{{y:.1f}}\u00b0F<extra></extra>"))
+        if not compact and obs["road_temp_f"].notna().any():
+            first = obs["road_temp_f"].first_valid_index()
+            fig.add_annotation(x=ot.loc[first], y=obs["road_temp_f"].loc[first], xref="x", yref="y",
+                               text="Observed (dots)", showarrow=False, xanchor="left", yanchor="bottom",
                                yshift=8, font=dict(color=p["text2"], size=12))
         x_range[0] = min(x_range[0], ot.min())
     fig.add_hline(y=FREEZING_F, line=dict(color=p["text2"], width=1, dash="dash"),
