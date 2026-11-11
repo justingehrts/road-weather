@@ -73,6 +73,9 @@ ROADCAST_COLUMNS = [
 ]
 
 
+NO_VALID_OBSERVATION = "No valid observation in"
+
+
 class NotEnoughData(Exception):
     """Inputs are fine but too sparse for METRo; the site is skipped, not failed."""
 
@@ -314,7 +317,12 @@ def run_metro(metro_dir: Path, python: str, work: Path, roadcast: Path) -> None:
     ]
     res = subprocess.run(cmd, env=metro_env(), cwd=work, capture_output=True, text=True, timeout=600)
     if res.returncode != 0 or not roadcast.exists():
-        tail = (res.stdout + res.stderr).strip().splitlines()[-15:]
+        output = res.stdout + res.stderr
+        if NO_VALID_OBSERVATION in output:
+            # METRo's own quality check threw out every reading (e.g. a flickering sensor). That is a lack
+            # of usable data, like any other, so skip the site instead of failing the whole run.
+            raise NotEnoughData("METRo's quality check rejected all observations")
+        tail = output.strip().splitlines()[-15:]
         log_tail = []
         if (work / "metro.log").exists():
             log_tail = (work / "metro.log").read_text(errors="replace").strip().splitlines()[-15:]
@@ -426,6 +434,9 @@ def main() -> int:
             n = roadcast_to_csv(roadcast_xml, out_csv, cycle)
             written += 1
             log(f"{sid}: wrote {out_csv} ({n} rows, {len(obs)} observations used)")
+        except NotEnoughData as exc:
+            skipped += 1
+            log(f"{sid}: skipped - {exc}")
         except Exception as exc:
             errors += 1
             log(f"{sid}: ERROR running METRo - {exc}")

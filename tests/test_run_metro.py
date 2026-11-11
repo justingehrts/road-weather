@@ -168,3 +168,31 @@ def test_relative_work_dir_still_works_because_paths_given_to_metro_are_absolute
         "--metro-python", sys.executable])
     assert run_metro.main() == 0
     assert (tmp_path / "roadcast" / f"{TAG}_s1.csv").exists()
+
+
+def test_metro_rejecting_all_observations_skips_the_site_instead_of_failing(tmp_path, monkeypatch):
+    """Real failure (site 38005): METRo's QA/QC dropped every reading and stopped with 'No valid observation'."""
+    (tmp_path / "metro" / "usr" / "bin").mkdir(parents=True)
+    (tmp_path / "metro" / "usr" / "bin" / "metro").write_text(
+        "import sys\nprint('STOP       : No valid observation in: /x/observation.xml')\nsys.exit(1)\n")
+    write_sites(tmp_path)
+    write_forcing(tmp_path)
+    (tmp_path / "forcing" / f"hrrr_{TAG}_s1.csv").write_text(
+        "cycle_utc,fxx,valid_time_utc,t2m_k,d2m_k,u10_ms,v10_ms,prate_kgm2s,crain,cfrzr,cicep,csnow,tcc_pct,"
+        "dswrf_wm2,dlwrf_wm2,sp_pa,grid_lat,grid_lon,ptype\n" +
+        "".join(f"{flags.iso(CYCLE)},{h},{flags.iso(CYCLE + timedelta(hours=h))},275,270,1,1,0,0,0,0,0,50,100,300,98000,40,-83,none\n"
+                for h in range(3)))
+    (tmp_path / "obs").mkdir()
+    with (tmp_path / "obs" / "s1.csv").open("w", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["obs_time_utc", "air_temp_f", "dewpoint_f", "wind_avg_mph", "wind_max_mph", "wind_dir",
+                    "road_temp_f", "subsurface_temp_f", "surface_condition", "surface_sensor_status"])
+        for h in (9, 10, 11):
+            w.writerow([flags.iso(CYCLE + timedelta(hours=h)), 40, 35, 5, 8, "N", 38, 45, "Dry", "Dry"])
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(sys, "argv", [
+        "run_metro.py", "--sites", "sites.yaml", "--obs-dir", "obs", "--forcing-dir", "forcing",
+        "--out-dir", "roadcast", "--work-dir", ".metro_work", "--metro-dir", "metro",
+        "--metro-python", sys.executable])
+    assert run_metro.main() == 0                       # skipped, not an error
+    assert not (tmp_path / "roadcast" / f"{TAG}_s1.csv").exists()
