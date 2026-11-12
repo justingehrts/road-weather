@@ -1,0 +1,282 @@
+{
+  "cycle": "2026111206z",
+  "cycle_utc": "2026-11-12T06:00:00Z",
+  "generated_utc": "2026-11-12T09:01:22Z",
+  "units": {
+    "temperature": "F",
+    "wind": "mph",
+    "score_frost": "F*h"
+  },
+  "thresholds": {
+    "freezing_f": 32.0,
+    "frost_min_hours": 2.0,
+    "frost_clear_calm_margin_f": 3.0,
+    "clear_cloud_pct": 25.0,
+    "calm_wind_mph": 5.0,
+    "wet_water_mm": 0.0,
+    "flash_drop_f": 6.0,
+    "flash_window_h": 3.0,
+    "glaze_rst_f": 20.0,
+    "glaze_light_snow_in_per_h": 0.04,
+    "glaze_blowing_wind_mph": 15.0,
+    "fresh_snow_hours": 6.0,
+    "snow_to_water_ratio": 10.0,
+    "salt_rst_f": 15.0,
+    "snow_ice_codes": [
+      3,
+      4,
+      7,
+      8
+    ],
+    "freezing_rain_prob": 0.5
+  },
+  "flag_names": {
+    "pavement_frost": "Pavement frost",
+    "black_ice": "Black ice / refreeze",
+    "flash_freeze": "Flash freeze",
+    "wheel_track_glazing": "Wheel-track glazing",
+    "bridges_first": "Bridges first",
+    "salt_struggles": "Salt struggles",
+    "freezing_rain": "Freezing rain"
+  },
+  "sites": {
+    "rwis_38010": {
+      "name": "US 33 at Hamilton Rd, Franklin Co.",
+      "station_type": "road",
+      "roadcast_start": "2026-11-12T09:00:00Z",
+      "roadcast_end": "2026-11-14T06:00:00Z",
+      "flags": [],
+      "evaluated": [
+        "pavement_frost",
+        "black_ice",
+        "flash_freeze",
+        "salt_struggles",
+        "freezing_rain"
+      ],
+      "not_evaluated": {
+        "wheel_track_glazing": "site is not marked traffic: heavy in sites.yaml",
+        "bridges_first": "not a bridge site"
+      }
+    },
+    "rwis_200061": {
+      "name": "I-270 at Cemetery Rd, Franklin Co.",
+      "station_type": "road",
+      "roadcast_start": "2026-11-12T09:00:00Z",
+      "roadcast_end": "2026-11-14T06:00:00Z",
+      "flags": [],
+      "evaluated": [
+        "pavement_frost",
+        "black_ice",
+        "flash_freeze",
+        "salt_struggles",
+        "wheel_track_glazing",
+        "freezing_rain"
+      ],
+      "not_evaluated": {
+        "bridges_first": "not a bridge site"
+      }
+    },
+    "rwis_200181": {
+      "name": "I-71 at SR 665, Franklin Co.",
+      "station_type": "road",
+      "roadcast_start": "2026-11-12T09:00:00Z",
+      "roadcast_end": "2026-11-14T06:00:00Z",
+      "flags": [],
+      "evaluated": [
+        "pavement_frost",
+        "black_ice",
+        "flash_freeze",
+        "salt_struggles",
+        "wheel_track_glazing",
+        "freezing_rain"
+      ],
+      "not_evaluated": {
+        "bridges_first": "not a bridge site"
+      }
+    },
+    "rwis_200015": {
+      "name": "SR 752 at railroad overpass, Pickaway Co.",
+      "station_type": "road",
+      "roadcast_start": "2026-11-12T09:00:00Z",
+      "roadcast_end": "2026-11-14T06:00:00Z",
+      "flags": [],
+      "evaluated": [
+        "pavement_frost",
+        "black_ice",
+        "flash_freeze",
+        "salt_struggles",
+        "freezing_rain"
+      ],
+      "not_evaluated": {
+        "wheel_track_glazing": "site is not marked traffic: heavy in sites.yaml",
+        "bridges_first": "not a bridge site"
+      }
+    },
+    "rwis_38000": {
+      "name": "I-71 at US 36, Delaware Co.",
+      "station_type": "road",
+      "roadcast_start": "2026-11-12T09:00:00Z",
+      "roadcast_end": "2026-11-14T06:00:00Z",
+      "flags": [
+        {
+          "flag": "black_ice",
+          "name": "Black ice / refreeze",
+          "start": "2026-11-13T21:40:00Z",
+          "end": "2026-11-13T22:20:00Z",
+          "hours": 1.0,
+          "score": 1,
+          "detail": "wet road froze (crossing #1 of 32F)"
+        },
+        {
+          "flag": "flash_freeze",
+          "name": "Flash freeze",
+          "start": "2026-11-13T21:40:00Z",
+          "end": "2026-11-13T22:20:00Z",
+          "hours": 1.0,
+          "score": 21.73,
+          "detail": "max RST drop in the 3 h window, F"
+        }
+      ],
+      "evaluated": [
+        "pavement_frost",
+        "black_ice",
+        "flash_freeze",
+        "salt_struggles",
+        "wheel_track_glazing",
+        "freezing_rain"
+      ],
+      "not_evaluated": {
+        "bridges_first": "not a bridge site"
+      }
+    },
+    "rwis_200011": {
+      "name": "SR 188 at US 33, Fairfield Co.",
+      "station_type": "road",
+      "roadcast_start": "2026-11-12T09:00:00Z",
+      "roadcast_end": "2026-11-14T06:00:00Z",
+      "flags": [],
+      "evaluated": [
+        "pavement_frost",
+        "black_ice",
+        "flash_freeze",
+        "salt_struggles",
+        "freezing_rain"
+      ],
+      "not_evaluated": {
+        "wheel_track_glazing": "site is not marked traffic: heavy in sites.yaml",
+        "bridges_first": "not a bridge site"
+      }
+    },
+    "rwis_200060": {
+      "name": "I-71 at CR 9, Madison Co.",
+      "station_type": "road",
+      "roadcast_start": "2026-11-12T09:00:00Z",
+      "roadcast_end": "2026-11-14T06:00:00Z",
+      "flags": [],
+      "evaluated": [
+        "pavement_frost",
+        "black_ice",
+        "flash_freeze",
+        "salt_struggles",
+        "wheel_track_glazing",
+        "freezing_rain"
+      ],
+      "not_evaluated": {
+        "bridges_first": "not a bridge site"
+      }
+    },
+    "rwis_200013": {
+      "name": "SR 13 at Sheridan Rd, Perry Co.",
+      "station_type": "road",
+      "roadcast_start": "2026-11-12T09:00:00Z",
+      "roadcast_end": "2026-11-14T06:00:00Z",
+      "flags": [],
+      "evaluated": [
+        "pavement_frost",
+        "black_ice",
+        "flash_freeze",
+        "salt_struggles",
+        "freezing_rain"
+      ],
+      "not_evaluated": {
+        "wheel_track_glazing": "site is not marked traffic: heavy in sites.yaml",
+        "bridges_first": "not a bridge site"
+      }
+    },
+    "rwis_200017": {
+      "name": "US 33 at SR 739, Union Co.",
+      "station_type": "road",
+      "roadcast_start": "2026-11-12T09:00:00Z",
+      "roadcast_end": "2026-11-14T06:00:00Z",
+      "flags": [],
+      "evaluated": [
+        "pavement_frost",
+        "black_ice",
+        "flash_freeze",
+        "salt_struggles",
+        "freezing_rain"
+      ],
+      "not_evaluated": {
+        "wheel_track_glazing": "site is not marked traffic: heavy in sites.yaml",
+        "bridges_first": "not a bridge site"
+      }
+    },
+    "rwis_200012": {
+      "name": "SR 13, milepost 3.66, Knox Co.",
+      "station_type": "road",
+      "roadcast_start": "2026-11-12T09:00:00Z",
+      "roadcast_end": "2026-11-14T06:00:00Z",
+      "flags": [],
+      "evaluated": [
+        "pavement_frost",
+        "black_ice",
+        "flash_freeze",
+        "salt_struggles",
+        "freezing_rain"
+      ],
+      "not_evaluated": {
+        "wheel_track_glazing": "site is not marked traffic: heavy in sites.yaml",
+        "bridges_first": "not a bridge site"
+      }
+    },
+    "rwis_38015": {
+      "name": "SR 4 at SR 203, Marion Co.",
+      "station_type": "road",
+      "roadcast_start": "2026-11-12T09:00:00Z",
+      "roadcast_end": "2026-11-14T06:00:00Z",
+      "flags": [],
+      "evaluated": [
+        "pavement_frost",
+        "black_ice",
+        "flash_freeze",
+        "salt_struggles",
+        "freezing_rain"
+      ],
+      "not_evaluated": {
+        "wheel_track_glazing": "site is not marked traffic: heavy in sites.yaml",
+        "bridges_first": "not a bridge site"
+      }
+    },
+    "rwis_200014": {
+      "name": "US 35 at SR 62, Fayette Co.",
+      "station_type": "road",
+      "roadcast_start": "2026-11-12T09:00:00Z",
+      "roadcast_end": "2026-11-14T06:00:00Z",
+      "flags": [],
+      "evaluated": [
+        "pavement_frost",
+        "black_ice",
+        "flash_freeze",
+        "salt_struggles",
+        "freezing_rain"
+      ],
+      "not_evaluated": {
+        "wheel_track_glazing": "site is not marked traffic: heavy in sites.yaml",
+        "bridges_first": "not a bridge site"
+      }
+    }
+  },
+  "skipped_sites": {
+    "rwis_38005": "no roadcast for this cycle (METRo skipped or failed)"
+  }
+}
