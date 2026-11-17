@@ -26,7 +26,11 @@ env:
 
 jobs:
   forecast:
-    runs-on: ubuntu-latest
+    # Pinned on purpose. METRo 4.0.1 only works with the system Python of Ubuntu 24.04 (3.12). On 2026-11-16
+    # `ubuntu-latest` moved to Ubuntu 26.04 (Python 3.14), the cached 3.12 build was no longer used, and the
+    # fresh build failed its self-test ("NameError: name 'toolbox' is not defined"). Move to a newer image
+    # only after METRo itself is patched for it.
+    runs-on: ubuntu-24.04
     timeout-minutes: 150   # HRRR step may wait up to 60 min for f48
     steps:
       - name: Check out code (main)
