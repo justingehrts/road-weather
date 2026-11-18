@@ -34,6 +34,7 @@ HRRR forcing ───────────┘
 
 - Deploy it from `main` with entrypoint `app/streamlit_app.py` (Streamlit Community Cloud is free); set Python to 3.11 in the deploy settings.
 - The Forecast page finds the newest forecast through `data/latest.json`, then loads `data/flags/<cycle>.json`, `data/roadcast/<cycle>_<site>.csv` and `data/obs/<site>.csv` from `raw.githubusercontent.com/justingehrts/road-weather/data/`. The Verification page reads `data/verification/summary.json`. Set `ROAD_WEATHER_DATA_URL` to point the app somewhere else for testing.
+- The Forecast page has a clickable map above the site dropdown (`app/site_map.py`): plain Plotly lines, no map tiles or outside service. County lines and Interstate/US/state highway lines come from `app/map_layers.json`, built once from US Census data by `scripts/build_map_layers.py` (needs `pip install pyshp`; the app never needs it). Marker shape + color show each site's status (no flags / 1 type / 2+ types / no forecast this run). A click is read from the chart's selection state and written to the dropdown's session-state key; each click bumps `map_generation` so the map's key changes and it starts with no remembered click. On phones the first tap previews (Plotly's tooltip) and the second opens the site.
 - Data stays in UTC; the app converts to Eastern only for display. Charts follow the data-viz palette rules (one temperature axis, validated colors, table view).
 
 ## Hard rules
@@ -60,7 +61,7 @@ Prefer small, focused PRs. Don't open a PR unless asked. Don't make sweeping cha
 - `scripts/`: pipeline code. `fetch_rwis.py`, `fetch_hrrr.py`, `build_metro.sh`, `run_metro.py`, `flags.py`, `verify.py`.
 - `docs/flags.md`: the hazard-flag rules (source of truth for `scripts/flags.py`; edit thresholds in `THRESHOLDS` at the top of that script).
 - `docs/verification.md`: how forecasts and flags are checked against RWIS observations (`scripts/verify.py`).
-- `app/`: Streamlit app: `streamlit_app.py` (entry point + navigation), pages `forecast.py` and `verification.py`, plus `charts.py`, `road_data.py`, `ui.py`, `requirements.txt`. It only **reads** from the `data` branch via raw GitHub URLs.
+- `app/`: Streamlit app: `streamlit_app.py` (entry point + navigation), pages `forecast.py` and `verification.py`, plus `charts.py`, `site_map.py` (clickable site map), `road_data.py`, `ui.py`, `requirements.txt`. It only **reads** from the `data` branch via raw GitHub URLs (plus `sites.yaml` from the repo, for the map's site coordinates, and the static `map_layers.json`).
 - `tests/`: pytest tests (`python -m pytest tests -q`). Run by `.github/workflows/tests.yml` on every PR.
 - `.github/workflows/`: `poll-obs.yml` (continuous observation poller), `fetch-obs.yml` (manual one-shot), `forecast.yml` (4x/day), `verify.yml` (daily), `tests.yml`, and `list-ohgo-sites.yml` (manual helper that lists OHGO site IDs near Columbus via `scripts/list_ohgo_sites.py`).
 - `data` branch: pipeline output only; no source code. `data/obs/`, `data/forcing/`, `data/roadcast/`, `data/flags/<cycle>.json`, `data/latest.json` (pointer to the newest cycle that the app reads), and `data/verification/summary.json` (daily).

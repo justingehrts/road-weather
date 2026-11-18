@@ -9,6 +9,7 @@ import streamlit as st
 
 import charts
 import road_data as rd
+import site_map
 from ui import fmt_et, is_phone, theme_name
 
 
@@ -26,6 +27,11 @@ def get_flags(cycle: str):
 @st.cache_data(ttl=300, show_spinner=False)
 def get_roadcast(cycle: str, site: str):
     return rd.load_roadcast(cycle, site)
+
+
+@st.cache_data(ttl=3600, show_spinner=False)
+def get_site_coords():
+    return rd.load_site_coords()
 
 
 @st.cache_data(ttl=300, show_spinner=False)
@@ -91,7 +97,54 @@ if flags.get("skipped_sites"):
 
 # ---- one site in detail ----
 st.subheader("Site detail")
-site_id = st.selectbox("Site", list(sites), format_func=lambda s: f"{sites[s]['name']}  ({sites[s]['station_type']})")
+SITE_KEY = "site_choice"
+theme = theme_name()
+compact = is_phone()
+
+# The map sits above the dropdown. A click on a dot picks that site; the dropdown can also pick one.
+# Each click bumps a counter that is part of the map's key, so the map starts again with no remembered
+# click and the two controls never fight over which site is chosen.
+coords = get_site_coords()
+points = site_map.site_points(coords, sites, flags.get("skipped_sites"))
+generation = st.session_state.setdefault("map_generation", 0)
+clicked = site_map.click_to_site(st.session_state.get(f"site_map_{generation}"), set(sites))
+if clicked:
+    st.session_state[SITE_KEY] = clicked
+    generation += 1
+    st.session_state["map_generation"] = generation
+if st.session_state.get(SITE_KEY) not in sites:
+    st.session_state[SITE_KEY] = next(iter(sites))
+site_id = st.session_state[SITE_KEY]
+
+if points:
+    map_col, card_col = st.columns([3, 2], gap="medium")
+    with map_col:
+        st.plotly_chart(
+            site_map.build_map(points, site_map.load_layers(), site_id, theme, compact), theme=None, width="stretch",
+            key=f"site_map_{generation}", on_select="rerun", selection_mode="points",
+            config={"displayModeBar": False, "scrollZoom": False},
+            alt="Map of the road weather stations with county lines and Interstate, US and state highways. "
+                "Each station is a marker: circle means no hazard flags, triangle one type of flag, diamond two or "
+                "more types, cross no forecast this run. Pick a station here or in the list below.")
+    with card_col:
+        chosen = next((q for q in points if q["id"] == site_id), None)
+        if compact:
+            st.markdown("**Tap a dot to preview it, tap it again to open that site**")
+            st.caption("The first tap shows the site's name and flags. The ring marks the site shown below. "
+                       "You can also pick a site in the list.")
+        else:
+            st.markdown("**Click a dot to open that site**")
+            st.caption("Hover over a dot to see its name and flags. The ring marks the site shown below. "
+                       "You can also pick a site in the list.")
+        if chosen:
+            label = {s[0]: s[1] for s in site_map.STATUSES}[chosen["status"]]
+            st.markdown(f"**{chosen['name']}** ({chosen['type']})  \n{label}")
+            if chosen["status"] != "ok":                 # "No hazard flags" is already the status line
+                for line in chosen["details"]:
+                    st.markdown(f"- {line}")
+
+site_id = st.selectbox("Site", list(sites), key=SITE_KEY,
+                       format_func=lambda s: f"{sites[s]['name']}  ({sites[s]['station_type']})")
 site = sites[site_id]
 
 road = get_roadcast(cycle, site_id)
@@ -101,9 +154,6 @@ if road is None:
 
 now = rd.now_eastern()
 obs = get_obs(site_id, road["time_utc"].min() - pd.Timedelta(hours=24))
-theme = theme_name()
-compact = is_phone()
-
 fig = charts.meteogram(road, obs, now, theme, compact)
 st.plotly_chart(fig, theme=None, width="stretch",
                 alt="Line chart of forecast road surface temperature, air temperature and dewpoint in "

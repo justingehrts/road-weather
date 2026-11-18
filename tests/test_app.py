@@ -140,3 +140,53 @@ def test_meteogram_plots_observed_air_and_dewpoint_dots():
     dots = {tr.name: list(tr.y) for tr in fig.data if tr.mode == "markers"}
     assert set(dots) == {"Road surface temp (observed)", "Air temp (observed)"}   # all-empty dewpoint is skipped
     assert dots["Air temp (observed)"][0] == 19.0
+
+
+# ------------------------------------------------------------------ the site map on the Forecast page
+S1 = {"s1": {"name": "Test Road", "lat": 40.0, "lon": -83.0, "station_type": "road"}}
+
+
+def test_page_shows_the_map_above_the_dropdown(tmp_path, monkeypatch):
+    build_data(tmp_path)
+    serve_from(monkeypatch, tmp_path)
+    monkeypatch.setattr(rd, "load_site_coords", lambda *a, **k: S1)
+    at = run_app()
+    assert not at.exception
+    assert at.selectbox[0].value == "s1"
+    # Map + meteogram + flag timeline
+    assert len(at.get("plotly_chart")) == 3
+    assert any("Click a dot to open that site" in m.value for m in at.markdown)
+
+
+def test_a_map_click_selects_that_site_and_resets_the_map(tmp_path, monkeypatch):
+    build_data(tmp_path)
+    serve_from(monkeypatch, tmp_path)
+    monkeypatch.setattr(rd, "load_site_coords", lambda *a, **k: S1)
+    at = AppTest.from_file(APP, default_timeout=60)
+    at.session_state["site_map_0"] = {"selection": {"points": [{"customdata": "s1"}]}}
+    at.run()
+    assert not at.exception
+    assert at.session_state["map_generation"] == 1            # the click was used up: the map starts fresh
+    assert at.session_state["site_choice"] == "s1"
+    assert at.selectbox[0].value == "s1"
+
+
+def test_a_click_on_something_that_is_not_a_site_is_ignored(tmp_path, monkeypatch):
+    build_data(tmp_path)
+    serve_from(monkeypatch, tmp_path)
+    monkeypatch.setattr(rd, "load_site_coords", lambda *a, **k: S1)
+    at = AppTest.from_file(APP, default_timeout=60)
+    at.session_state["site_map_0"] = {"selection": {"points": [{"x": 1, "y": 2}]}}
+    at.run()
+    assert not at.exception
+    assert at.session_state["map_generation"] == 0
+
+
+def test_page_works_with_no_site_coordinates(tmp_path, monkeypatch):
+    build_data(tmp_path)
+    serve_from(monkeypatch, tmp_path)
+    monkeypatch.setattr(rd, "load_site_coords", lambda *a, **k: {})
+    at = run_app()
+    assert not at.exception
+    assert len(at.get("plotly_chart")) == 2                    # no map, charts still there
+    assert at.selectbox[0].value == "s1"
