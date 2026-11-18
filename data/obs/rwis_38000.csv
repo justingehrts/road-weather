@@ -834,3 +834,7 @@ obs_time_utc,air_temp_f,dewpoint_f,wind_avg_mph,wind_max_mph,wind_dir,road_temp_
 2026-11-18T12:35:03Z,34,30.7,1.2,3.7,North,35.4,,Dry,Dry
 2026-11-18T12:50:03Z,35.1,30.7,1.2,2.5,North,35.6,,Dry,Dry
 2026-11-18T13:05:02Z,35.1,31.1,1.2,2.5,North,36,,Dry,Dry
+2026-11-18T13:20:03Z,36.3,31.5,1.2,2.5,North,36.9,,Dry,Dry
+2026-11-18T13:35:03Z,37.9,32.2,1.2,2.5,Northeast,38.1,,Dry,Dry
+2026-11-18T13:50:03Z,38.8,32.9,1.2,3.1,Northeast,39.4,,Dry,Dry
+2026-11-18T14:05:02Z,41.2,33.6,1.2,2.5,Northeast,41,,Dry,Dry
