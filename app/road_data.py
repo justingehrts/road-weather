@@ -9,6 +9,7 @@ import io
 import json
 import os
 from datetime import datetime, timezone
+from pathlib import Path
 
 import pandas as pd
 import requests
@@ -102,3 +103,21 @@ def flag_intervals(site_flags: dict) -> pd.DataFrame:
 def age_hours(generated_utc: str) -> float:
     t = datetime.strptime(generated_utc, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
     return (datetime.now(timezone.utc) - t).total_seconds() / 3600.0
+
+
+SITES_FILE = Path(os.environ.get("ROAD_WEATHER_SITES_FILE") or Path(__file__).resolve().parents[1] / "sites.yaml")
+
+
+def load_site_coords(path: Path = SITES_FILE) -> dict[str, dict]:
+    """{site id: name, lat, lon, station_type} from sites.yaml (shipped next to the app), or {} if unavailable.
+
+    The map is optional: with no coordinates the page simply shows no map.
+    """
+    try:
+        import yaml
+        data = yaml.safe_load(Path(path).read_text()) or {}
+        return {s["id"]: {"name": s["name"], "lat": float(s["lat"]), "lon": float(s["lon"]),
+                          "station_type": s.get("station_type", "road")}
+                for s in data.get("sites", [])}
+    except Exception:           # missing file, missing PyYAML, bad entry: show the page without the map
+        return {}

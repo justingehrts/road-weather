@@ -1,3 +1,4 @@
 .herbie_cache/
 .metro_work/
 __pycache__/
+.map_cache/
