@@ -1751,3 +1751,7 @@ obs_time_utc,air_temp_f,dewpoint_f,wind_avg_mph,wind_max_mph,wind_dir,road_temp_
 2026-11-28T01:50:03Z,38.1,35.2,,,,41.9,,Trace Wet,Trace Wet
 2026-11-28T02:05:02Z,37.9,35.1,,,,41.9,47.3,Trace Wet,Trace Wet
 2026-11-28T02:20:03Z,38.1,35.6,,,,41.9,47.3,Trace Wet,Trace Wet
+2026-11-28T02:35:03Z,38.3,36.1,,,,41.9,,Dry,Dry
+2026-11-28T02:50:03Z,38.7,36,,,,41.9,47.3,Trace Wet,Trace Wet
+2026-11-28T03:05:03Z,38.8,35.6,,,,41.9,,Dry,Dry
+2026-11-28T03:20:02Z,38.8,35.6,,,,41.9,47.3,Dry,Dry
